@@ -36,7 +36,6 @@ class Ticket(models.Model):
             return True
         else:
             return True
-        
 
     def __str__(self) -> str:
         return str(self.id)

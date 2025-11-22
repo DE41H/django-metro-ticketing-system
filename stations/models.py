@@ -6,7 +6,7 @@ from django.db import models
 class Line(models.Model):
     name = models.CharField(verbose_name='name', max_length=200, unique=True, primary_key=True)
     color = models.CharField(verbose_name='color', max_length=7, unique=True)
-    enabled = models.BooleanField(verbose_name='enabled', default=False)
+    allow_ticket_purchase = models.BooleanField(verbose_name='allow_ticket_purchase', default=False)
 
     def __str__(self) -> str:
         return str(self.name)
