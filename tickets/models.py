@@ -1,9 +1,11 @@
 import uuid
+from decimal import Decimal
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
+from django.db.models import F
 
 # Create your models here.
 
@@ -39,3 +41,19 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
+    
+
+class Wallet(models.Model):
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet')
+    balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+
+    def deduct(self, amount) -> bool:
+        if self.balance < amount:
+            return False
+        else:
+            super().objects.filter(pk=self.pk).update(balance = F('balance') - amount)
+            self.refresh_from_db()
+            return True
+
+    def __str__(self) -> str:
+        return str(self.user)
