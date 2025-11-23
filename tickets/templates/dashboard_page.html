@@ -5,19 +5,18 @@
 {% block content %}
     <h1>Welcome, {{ user.username }}!</h1>
 
-    {% comment %} Accessing wallet via user.wallet (assuming related_name='wallet') {% endcomment %}
     {% if user.wallet %}
         <h2>Wallet Summary</h2>
         <p>Current Balance: <strong>${{ user.wallet.balance|default:"0.00" }}</strong></p>
-        <p><a href="{% url 'wallet_update' %}">Add Funds</a></p>
+        <p><a href="{% url 'tickets:wallet_balance_update' %}">Add Funds</a></p>
     {% else %}
         <p>Wallet not initialized. Contact support.</p>
     {% endif %}
     
     <h2>Ticket Actions</h2>
     <ul>
-        <li><a href="{% url 'ticket_purchase' %}">Buy New Ticket</a></li>
-        <li><a href="{% url 'ticket_list' %}">View My Tickets</a></li>
+        <li><a href="{% url 'tickets:ticket_purchase' %}">Buy New Ticket</a></li>
+        <li><a href="{% url 'tickets:ticket_list' %}">View My Tickets</a></li>
     </ul>
 
 {% endblock %}

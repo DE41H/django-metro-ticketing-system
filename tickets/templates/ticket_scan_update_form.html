@@ -8,10 +8,9 @@
 
     <form method="post">
         {% csrf_token %}
-        {% comment %} Assuming form has only 'ticket_id' field {% endcomment %}
         {{ form.as_p }}
         <button type="submit">Scan & Update Status</button>
     </form>
     
-    <p><a href="{% url 'scanner_home' %}">Back to Scanner Home</a></p>
+    <p><a href="{% url 'tickets:scanner' %}">Back to Scanner Home</a></p>
 {% endblock %}

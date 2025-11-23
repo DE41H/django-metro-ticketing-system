@@ -9,10 +9,9 @@
     
     <h2>Ticket Management</h2>
     <ul>
-        <li><a href="{% url 'ticket_scan_update' %}">Scan / Validate Ticket</a></li>
-        <li><a href="{% url 'ticket_purchase_offline' %}">Offline Ticket Purchase</a></li>
+        <li><a href="{% url 'tickets:ticket_scan' %}">Scan / Validate Ticket</a></li>
+        <li><a href="{% url 'tickets:ticket_purchase_offline' %}">Offline Ticket Purchase</a></li>
     </ul>
     
-    {% comment %} Link to Django Admin page {% endcomment %}
     <p><a href="/admin/">Go to Django Admin</a></p>
 {% endblock %}

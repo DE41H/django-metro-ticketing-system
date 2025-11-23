@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1>Top Up Wallet Balance</h1>
-    {% comment %} Assuming get_object in view makes the wallet available via context {% endcomment %}
+    
     {% if user.is_authenticated and user.wallet %}
         <p>Current Balance: <strong>${{ user.wallet.balance|default:"0.00" }}</strong></p>
     {% endif %}
@@ -15,5 +15,5 @@
         <button type="submit">Add Funds</button>
     </form>
     
-    <p><a href="{% url 'dashboard' %}">Go to Dashboard</a></p> 
+    <p><a href="{% url 'tickets:dashboard' %}">Go to Dashboard</a></p> 
 {% endblock %}

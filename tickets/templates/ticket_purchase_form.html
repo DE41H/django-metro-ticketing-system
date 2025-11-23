@@ -5,7 +5,6 @@
 {% block content %}
     <h1>Purchase New Ticket</h1>
     
-    {% comment %} Wallet balance for context {% endcomment %}
     {% if user.is_authenticated and user.wallet %}
         <p>Your Current Wallet Balance: <strong>${{ user.wallet.balance|default:"0.00" }}</strong></p>
     {% endif %}
@@ -16,5 +15,5 @@
         <button type="submit">Purchase Ticket</button>
     </form>
     
-    <p><a href="{% url 'wallet_update' %}">Top Up Wallet</a></p> 
+    <p><a href="{% url 'tickets:wallet_balance_update' %}">Top Up Wallet</a></p> 
 {% endblock %}
