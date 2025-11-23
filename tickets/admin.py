@@ -6,11 +6,11 @@ from .models import Ticket
 
 class TicketAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['id', 'user']}),
-        ('Details', {'fields': ['start', 'stop', 'created_at'], 'classes': ['collapse']}),
+        (None, {'fields': ['user']}),
+        ('Details', {'fields': ['start', 'stop', 'created_at', 'status', 'expired'], 'classes': ['collapse']}),
     ]
-    list_display = ['id', 'start', 'stop', 'created_at', 'user']
-    search_fields = ['id']
+    list_display = ['user', 'start', 'stop', 'created_at', 'status', 'expired']
+    search_fields = ['user']
 
 
 admin.site.register(Ticket, TicketAdmin)

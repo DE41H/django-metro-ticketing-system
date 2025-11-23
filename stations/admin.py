@@ -3,20 +3,31 @@ from .models import Station, Line
 
 # Register your models here.
 
+@admin.register(Station)
+class StationAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('name', 'footfall')}),
+        ('Relationships', {'fields': ('lines', 'neighbours')})
+    )
+    list_display = ('name', 'footfall')
+    search_fields = ('name',)
+    filter_horizontal = ('lines', 'neighbours')
+
 
 class StationInline(admin.TabularInline):
-    model = Station
+    model = Station.lines.through
     extra = 1
+    verbose_name_plural = 'Stations on this Line'
+    fields = ('station',)
 
 
+@admin.register(Line)
 class LineAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['name']}),
-        ('config', {'fields': ['color', 'allow_ticket_purchase'], 'classes': ['collapse']})
-    ]
-    inlines = [StationInline]
-    list_display = ['name', 'color', 'allow_ticket_purchase']
-    search_fields = ['name']
+    fieldsets = (
+        (None, {'fields': ('name',)}),
+        ('Details', {'fields': ('color', 'allow_ticket_purchase'), 'classes': ('collapse',)})
+    )
+    list_display = ('name', 'color', 'allow_ticket_purchase')
+    inlines = (StationInline,)
+    search_fields = ('name', 'color')
 
-
-admin.site.register(Line, LineAdmin)
