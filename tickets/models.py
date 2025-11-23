@@ -14,7 +14,7 @@ class Ticket(models.Model):
     id = models.UUIDField(verbose_name='id', unique=True, primary_key=True, default=uuid.uuid4, editable=False)
     start = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='departing_tickets', verbose_name='start')
     stop = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='arriving_tickets', verbose_name='stop')
-    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets', null=True)
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
     created_at = models.DateTimeField(verbose_name='created at', default=timezone.now)
 
     class State(models.TextChoices):

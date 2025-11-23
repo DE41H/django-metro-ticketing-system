@@ -11,11 +11,11 @@ class TicketAdmin(admin.ModelAdmin):
         ('Status', {'fields': ('status',)}),
         ('Details', {'fields': ('id', 'start', 'stop', 'created_at', 'expired'), 'classes': ('collapse',)})
     )
-    list_display = ('user', 'start', 'stop', 'created_at', 'status', 'expired')
+    list_display = ('user', 'start', 'stop', 'created_at', 'status')
     list_select_related = ('user', 'start', 'stop')
-    readonly_fields = ('id', 'user', 'created_at',)
+    readonly_fields = ('id', 'user', 'created_at', 'expired')
     search_fields = ('id', 'user__username', 'start__name', 'stop__name')
-    ordering = ('id',)
+    ordering = ('-created_at',)
 
 
 @admin.register(Wallet)
