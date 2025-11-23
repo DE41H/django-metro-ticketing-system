@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from typing import Any
 from django import forms
 from .models import Wallet, Ticket
@@ -9,8 +10,9 @@ class WalletBalanceUpdateForm(forms.ModelForm):
         label='Amount to Add',
         max_digits=19,
         decimal_places=2,
-        min_value=0.01,
-        widget = forms.NumberInput(attrs={'step': '0.01'})
+        min_value=Decimal(0.01),
+        widget = forms.NumberInput(attrs={'step': '0.01'}),
+        required=True
     )
     
 
@@ -18,18 +20,10 @@ class WalletBalanceUpdateForm(forms.ModelForm):
         model = Wallet
         fields = []
 
-    
-    def clean(self) -> dict[str, Any]:
-        amount = self.cleaned_data.get('amount')
-        if amount <= 0: # type: ignore
-            raise forms.ValidationError('Amount added must be greater than zero!')
-        return super().clean()
-
 
 class TicketScanUpdateForm(forms.ModelForm):
-    sample_id = str(uuid.uuid4)
-    ticket_id = forms.UUIDField(min_length=len(sample_id), max_length=len(sample_id))
-
+    ticket_id = forms.UUIDField(required=True)
+    
     
     class Meta:
         model = Ticket
@@ -37,9 +31,13 @@ class TicketScanUpdateForm(forms.ModelForm):
 
     
     def clean(self) -> dict[str, Any]:
-        ticket_id = self.cleaned_data.get('ticket_id')
-        if not Ticket.objects.filter(id=ticket_id):
+        try:
+            ticket = Ticket.objects.get(id=self.cleaned_data.get('ticket_id'))
+        except Ticket.DoesNotExist:
             raise forms.ValidationError('Ticket Does Not Exist!')
-        elif not Ticket.objects.filter(id=ticket_id, status=Ticket.State.EXPIRED):
-            raise forms.ValidationError('Ticket is Expired!')
+        match ticket.status:
+            case Ticket.State.EXPIRED:
+                raise forms.ValidationError('Ticket is Expired!')
+            case Ticket.State.USED:
+                raise forms.ValidationError('Ticket has already been Used!')
         return super().clean()

@@ -78,11 +78,7 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
         return self.request.user.is_staff
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        try:
-            ticket_id = form.cleaned_data.get('ticket_id')
-        except Ticket.DoesNotExist:
-            messages.error(self.request, f'Ticket Does Not Exist')
-            return redirect('/tickets/scanner/scan/')
+        ticket_id = form.cleaned_data.get('ticket_id')
         ticket = Ticket.objects.get(id=ticket_id)
         match ticket.status:
             case Ticket.State.ACTIVE:
