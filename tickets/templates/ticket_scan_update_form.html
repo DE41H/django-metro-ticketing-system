@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan Ticket{% endblock %}
+
+{% block content %}
+    <h1>Scan Ticket Status Update</h1>
+    <p>Enter the 36-character UUID of the ticket to change its status.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% comment %} Assuming form has only 'ticket_id' field {% endcomment %}
+        {{ form.as_p }}
+        <button type="submit">Scan & Update Status</button>
+    </form>
+    
+    <p><a href="{% url 'scanner_home' %}">Back to Scanner Home</a></p>
+{% endblock %}

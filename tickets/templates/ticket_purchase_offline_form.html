@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Offline Purchase{% endblock %}
+
+{% block content %}
+    <h1>Staff: Offline Ticket Purchase</h1>
+    <p>Creates a ticket not tied to a registered passenger's wallet (user=None).</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Issue Ticket (No Charge)</button>
+    </form>
+    
+    <p><a href="{% url 'scanner_home' %}">Back to Scanner Home</a></p>
+{% endblock %}

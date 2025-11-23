@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tickets{% endblock %}
+
+{% block content %}
+    <h1>My Active and Past Tickets</h1>
+
+    {% if tickets %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Status</th>
+                    <th>Purchased On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id|truncatechars:8 }}</td>
+                    <td>{{ ticket.start.name }}</td>
+                    <td>{{ ticket.stop.name }}</td>
+                    <td><strong>{{ ticket.get_status_display }}</strong></td>
+                    <td>{{ ticket.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no tickets. <a href="{% url 'ticket_purchase' %}">Buy one now</a>!</p>
+    {% endif %}
+{% endblock %}

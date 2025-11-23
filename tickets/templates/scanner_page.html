@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Ticket Scanner{% endblock %}
+
+{% block content %}
+    <h1>Staff Scanner Portal</h1>
+    
+    <p>Welcome, {{ user.username }}. Use the options below to manage tickets.</p>
+    
+    <h2>Ticket Management</h2>
+    <ul>
+        <li><a href="{% url 'ticket_scan_update' %}">Scan / Validate Ticket</a></li>
+        <li><a href="{% url 'ticket_purchase_offline' %}">Offline Ticket Purchase</a></li>
+    </ul>
+    
+    {% comment %} Link to Django Admin page {% endcomment %}
+    <p><a href="/admin/">Go to Django Admin</a></p>
+{% endblock %}
