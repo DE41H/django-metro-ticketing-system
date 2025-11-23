@@ -18,4 +18,5 @@ class LineAdmin(admin.ModelAdmin):
     list_display = ['name', 'color', 'allow_ticket_purchase']
     search_fields = ['name']
 
+
 admin.site.register(Line, LineAdmin)
