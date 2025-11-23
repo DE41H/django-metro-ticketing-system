@@ -25,8 +25,13 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         form.instance.user = self.request.user
+        start = form.instance.start
+        stop = form.instance.stop
         wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
-        price = calculate_ticket_price(form.instance.start, form.instance.stop)
+        if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
+            return redirect(self.request.path)
+        price = calculate_ticket_price(start, stop)
         try:
             with transaction.atomic():
                 success = wallet.deduct(Decimal(price))
@@ -37,7 +42,7 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
             return super().form_valid(form)
         except Exception:
             messages.error(self.request, 'Purchase Failed! Insufficient Wallet Funds')
-            return redirect('/tickets/buy/')
+            return redirect(self.request.path)
             
         
 

@@ -25,9 +25,11 @@ class StationInline(admin.TabularInline):
 class LineAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name',)}),
-        ('Details', {'fields': ('color', 'allow_ticket_purchase'), 'classes': ('collapse',)})
+        ('Details', {'fields': ('color',), 'classes': ('collapse',)}),
+        ('Services', {'fields': ('allow_ticket_purchase', 'is_running'), 'classes': ('collapse',)})
     )
-    list_display = ('name', 'color', 'allow_ticket_purchase')
+    list_display = ('name', 'color', 'allow_ticket_purchase', 'is_running')
+    list_editable = ('allow_ticket_purchase', 'is_running')
     inlines = (StationInline,)
     search_fields = ('name', 'color')
 
