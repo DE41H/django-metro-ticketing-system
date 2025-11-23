@@ -37,7 +37,7 @@ class Ticket(models.Model):
         elif self.status == self.State.EXPIRED:
             return True
         else:
-            return True
+            return False
 
     def __str__(self) -> str:
         return str(self.id)
@@ -47,11 +47,11 @@ class Wallet(models.Model):
     user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet')
     balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
 
-    def deduct(self, amount: float) -> bool:
+    def deduct(self, amount: Decimal) -> bool:
         if self.balance < amount:
             return False
         else:
-            super().objects.filter(pk=self.pk).update(balance = F('balance') - amount)
+            Wallet.objects.filter(pk=self.pk).update(balance = F('balance') - amount)
             self.refresh_from_db()
             return True
 

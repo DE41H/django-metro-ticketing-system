@@ -1,4 +1,5 @@
 from typing import Any
+from decimal import Decimal
 from django.db import transaction
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
@@ -28,7 +29,7 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
         price = calculate_ticket_price(form.instance.start, form.instance.stop)
         try:
             with transaction.atomic():
-                success = wallet.deduct(price)
+                success = wallet.deduct(Decimal(price))
                 if not success:
                     raise Exception('Insufficient Funds')
             form.instance.user = self.request.user
