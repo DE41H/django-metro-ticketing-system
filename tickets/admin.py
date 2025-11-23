@@ -8,10 +8,14 @@ from .models import Ticket, Wallet
 class TicketAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('user',)}),
-        ('Details', {'fields': ('start', 'stop', 'created_at', 'status', 'expired'), 'classes': ('collapse',)}),
+        ('Status', {'fields': ('status',)}),
+        ('Details', {'fields': ('id', 'start', 'stop', 'created_at', 'expired'), 'classes': ('collapse',)})
     )
     list_display = ('user', 'start', 'stop', 'created_at', 'status', 'expired')
-    search_fields = ('user',)
+    list_select_related = ('user', 'start', 'stop')
+    readonly_fields = ('id', 'user', 'created_at',)
+    search_fields = ('id', 'user__username', 'start__name', 'stop__name')
+    ordering = ('id',)
 
 
 @admin.register(Wallet)
@@ -21,4 +25,5 @@ class WalletAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('user',)
     list_display = ('user', 'balance')
-    search_fields = ('user',)
+    search_fields = ('user__username',)
+    ordering = ('user__username',)
