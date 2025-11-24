@@ -13,14 +13,15 @@ CWD = os.path.dirname(os.path.abspath(__file__))
 def calculate_route(start: Station, stop: Station) -> list[Station]:
     if start == stop:
         return [start]
+    all_stations = Station.objects.prefetch_related('neighbours', 'lines').in_bulk([start.pk, stop.pk])
     queue = deque([start])
     parents: dict[Station, Station|None] = {start: None}
     visited = {start}
     while queue:
         current = queue.popleft()
         for neighbour in current.neighbours.all():
-            line = Line.objects.filter(stations__name=current.name).filter(stations__name=neighbour.name).distinct()
-            if neighbour not in visited and line.is_running: # type: ignore
+            line = Line.objects.filter(stations__name=current.name, is_running=True).filter(stations__name=neighbour.name).distinct().exists()
+            if neighbour not in visited and line: # type: ignore
                 visited.add(neighbour)
                 parents[neighbour] = current
                 if neighbour == stop:
@@ -31,18 +32,20 @@ def get_path(parents: dict[Station, Station|None], start: Station, stop: Station
     path = []
     current = stop
     while current is not None:
-        path.append(current.name)
-        current = parents[current]
+        path.append(current)
+        current = parents.get(current)
     return path[::-1]
 
 def create_map(path: str) -> None:
-    G: nx.Graph[int] = nx.Graph()
-    for station in Station.objects.all():
-        G.add_node(station.pk, label=station.name, title=str(station.lines), size=15, font={'size': 30, 'vadjust': 5})
+    G: nx.Graph[str] = nx.Graph()
+    all_stations = Station.objects.prefetch_related('lines', 'neighbours')
+    for station in all_stations:
+        lines = ', '.join([line.name for line in station.lines.all()])
+        G.add_node(station.name, label=station.name, title=f'Lines: {lines}', size=15, font={'size': 30, 'vadjust': 5})
     for station in Station.objects.all():
         for neighbour in station.neighbours.all():
             if not G.has_edge(station.pk, neighbour.pk):
-                line = Line.objects.filter(stations__name=station.name).filter(stations__name=neighbour.name).distinct()
+                line = Line.objects.filter(stations__name=station.name).filter(stations__name=neighbour.name).distinct().first()
                 G.add_edge(station.pk, neighbour.pk, color=line.color) # type: ignore
     net = Network(height='1000px', width='100%', notebook=True)
     net.from_nx(G)

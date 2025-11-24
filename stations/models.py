@@ -17,7 +17,7 @@ class Line(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(verbose_name='name', max_length=200, unique=True)
+    name = models.CharField(verbose_name='name', max_length=200, unique=True, primary_key=True)
     lines = models.ManyToManyField(to="stations.Line", related_name='stations', blank=True)
     neighbours = models.ManyToManyField(to='self', symmetrical=False, blank=True)
     footfall = models.PositiveBigIntegerField(verbose_name='footfall', default=0)
