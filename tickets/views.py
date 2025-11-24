@@ -1,6 +1,7 @@
 from typing import Any
 from decimal import Decimal
 from django.db import transaction
+from django.db.models import F
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.forms import BaseModelForm
@@ -53,7 +54,7 @@ class TicketListView(LoginRequiredMixin, generic.ListView):
     ordering = ['-created_at']
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Ticket.objects.select_related('start', 'stop') # type: ignore
+        return Ticket.objects.select_related('start', 'stop').filter(user=self.request.user) # type: ignore
     
 
 class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
@@ -87,8 +88,10 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
         ticket = Ticket.objects.get(id=ticket_id)
         match ticket.status:
             case Ticket.State.ACTIVE:
+                ticket.start.footfall = F('footfall') + 1
                 ticket.raw_status = ticket.State.IN_USE
             case Ticket.State.IN_USE:
+                ticket.stop.footfall = F('footfall') + 1
                 ticket.raw_status = ticket.State.USED
         ticket.save()
         return redirect(self.get_success_url())
