@@ -20,7 +20,7 @@ from .forms import WalletBalanceUpdateForm, TicketScanUpdateForm
 class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
     model = Ticket
     fields = ['start', 'stop']
-    template_name = 'ticket_purchase_form.html'
+    template_name = 'tickets/ticket_purchase_form.html'
     success_url = '/tickets/my/'
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
@@ -48,7 +48,7 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
 
 class TicketListView(LoginRequiredMixin, generic.ListView):
     model = Ticket
-    template_name = 'ticket_list.html'
+    template_name = 'tickets/ticket_list.html'
     context_object_name = 'tickets'
     ordering = ['-created_at']
 
@@ -60,7 +60,7 @@ class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
     model = Wallet
     form_class = WalletBalanceUpdateForm
     context_object_name = 'wallet'
-    template_name = 'wallet_balance_update_form.html'
+    template_name = 'user/wallet_balance_update_form.html'
     success_url = '/tickets/dashboard/'
 
     def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model: # type: ignore
@@ -76,7 +76,7 @@ class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
 class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
     model = Ticket
     form_class = TicketScanUpdateForm
-    template_name = 'ticket_scan_update_form.html'
+    template_name = 'scanner/ticket_scan_update_form.html'
     success_url = '/tickets/scanner/'
 
     def test_func(self) -> bool | None:
@@ -97,7 +97,7 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
 class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
     model = Ticket
     fields = ['start', 'stop']
-    template_name = 'ticket_purchase_offline_form.html'
+    template_name = 'scanner/ticket_purchase_offline_form.html'
     success_url = '/tickets/scanner/'
 
     def test_func(self) -> bool | None:
@@ -114,7 +114,7 @@ class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
     
 
 class DashboardTemplateView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'dashboard_page.html'
+    template_name = 'user/dashboard_page.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -123,7 +123,7 @@ class DashboardTemplateView(LoginRequiredMixin, generic.TemplateView):
 
 
 class ScannerTemplateView(UserPassesTestMixin, generic.TemplateView):
-    template_name = 'scanner_page.html'
+    template_name = 'scanner/scanner_page.html'
 
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
