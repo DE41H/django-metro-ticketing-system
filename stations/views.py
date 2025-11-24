@@ -18,7 +18,7 @@ class StationListView(generic.ListView):
     
 
 class MapTemplateView(generic.TemplateView):
-    template_name = get_map()
+    template_name = 'maps/placeholder.html'
 
     def get_template_names(self) -> list[str]:
         return [get_map()]
