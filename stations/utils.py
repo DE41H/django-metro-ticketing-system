@@ -1,5 +1,6 @@
 import os
 import networkx as nx
+from collections import deque
 from hashlib import sha512
 from pyvis.network import Network # type: ignore
 from django.db.models import Value, CharField, F
@@ -10,7 +11,29 @@ from .models import Station, Line
 CWD = os.path.dirname(os.path.abspath(__file__))
 
 def calculate_route(start: Station, stop: Station) -> list[Station]:
+    if start == stop:
+        return [start]
+    queue = deque([start])
+    parents: dict[Station, Station|None] = {start: None}
+    visited = {start}
+    while queue:
+        current = queue.popleft()
+        for neighbour in current.neighbours.all():
+            line = Line.objects.filter(stations__name=current.name).filter(stations__name=neighbour.name).distinct()
+            if neighbour not in visited and line.is_running: # type: ignore
+                visited.add(neighbour)
+                parents[neighbour] = current
+                if neighbour == stop:
+                    return get_path(parents=parents, start=start, stop=stop)
     return []
+
+def get_path(parents: dict[Station, Station|None], start: Station, stop: Station) -> list[Station]:
+    path = []
+    current = stop
+    while current is not None:
+        path.append(current.name)
+        current = parents[current]
+    return path[::-1]
 
 def create_map(path: str) -> None:
     G: nx.Graph[int] = nx.Graph()

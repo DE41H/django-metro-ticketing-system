@@ -11,6 +11,9 @@ class Line(models.Model):
 
     def __str__(self) -> str:
         return str(self.name)
+    
+    def __hash__(self) -> int:
+        return hash(self.name)
 
 
 class Station(models.Model):
@@ -21,3 +24,6 @@ class Station(models.Model):
 
     def __str__(self) -> str:
         return str(self.name)
+    
+    def __hash__(self) -> int:
+        return hash(self.name)

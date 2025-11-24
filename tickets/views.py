@@ -6,7 +6,7 @@ from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.forms import BaseModelForm
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -31,6 +31,9 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
         wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
         if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
             messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
+            return redirect(self.request.path)
+        elif start == stop:
+            messages.error(self.request, 'Start and Destination cannot be the same!')
             return redirect(self.request.path)
         price = calculate_ticket_price(start, stop)
         try:
