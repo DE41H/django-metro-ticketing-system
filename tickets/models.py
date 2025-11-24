@@ -14,7 +14,7 @@ class Ticket(models.Model):
     id = models.UUIDField(verbose_name='id', unique=True, primary_key=True, default=uuid.uuid4, editable=False)
     start = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='departing_tickets', verbose_name='start')
     stop = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='arriving_tickets', verbose_name='stop')
-    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
+    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets', null=True)
     created_at = models.DateTimeField(verbose_name='created at', default=timezone.now)
 
     class State(models.TextChoices):
@@ -25,25 +25,24 @@ class Ticket(models.Model):
 
     raw_status = models.CharField(verbose_name='status', max_length=10, choices=State.choices, default=State.ACTIVE)
 
+    @property
     @admin.display(
-        boolean=False,
         ordering='-created_at',
         description='Current Status'
     )
-    @property
     def status(self):
         raw_status = self.raw_status
         if raw_status == self.State.ACTIVE and self.expired():
-            self.__class__.objects.filter(pk=self.pk).update(status=self.State.EXPIRED)
+            self.__class__.objects.filter(pk=self.pk).update(raw_status=self.State.EXPIRED)
             self.refresh_from_db()
             return self.State.EXPIRED
-        return raw_status
+        return raw_status # type: ignore
 
     def expired(self) -> bool:
-        if self.status == self.State.ACTIVE:
+        if self.raw_status == self.State.ACTIVE:
             expiry = self.created_at + timedelta(days=2)
             return timezone.now() > expiry
-        elif self.status == self.State.EXPIRED:
+        elif self.raw_status == self.State.EXPIRED:
             return True
         else:
             return False
