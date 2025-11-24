@@ -87,9 +87,9 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
         ticket = Ticket.objects.get(id=ticket_id)
         match ticket.status:
             case Ticket.State.ACTIVE:
-                ticket.status = ticket.State.IN_USE
+                ticket.raw_status = ticket.State.IN_USE
             case Ticket.State.IN_USE:
-                ticket.status = ticket.State.USED
+                ticket.raw_status = ticket.State.USED
         ticket.save()
         return redirect(self.get_success_url())
     

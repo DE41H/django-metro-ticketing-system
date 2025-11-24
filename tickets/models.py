@@ -23,13 +23,22 @@ class Ticket(models.Model):
         USED = 'USED', 'Used'
         EXPIRED = 'EXPIRED', 'Expired'
 
-    status = models.CharField(verbose_name='status', max_length=10, choices=State.choices, default=State.ACTIVE)
+    raw_status = models.CharField(verbose_name='status', max_length=10, choices=State.choices, default=State.ACTIVE)
 
     @admin.display(
-        boolean=True,
-        ordering='created_at',
-        description='Is expired?'
+        boolean=False,
+        ordering='-created_at',
+        description='Current Status'
     )
+    @property
+    def status(self):
+        raw_status = self.raw_status
+        if raw_status == self.State.ACTIVE and self.expired():
+            self.__class__.objects.filter(pk=self.pk).update(status=self.State.EXPIRED)
+            self.refresh_from_db()
+            return self.State.EXPIRED
+        return raw_status
+
     def expired(self) -> bool:
         if self.status == self.State.ACTIVE:
             expiry = self.created_at + timedelta(days=2)
