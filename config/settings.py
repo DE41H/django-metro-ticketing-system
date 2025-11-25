@@ -21,14 +21,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(config('DEBUG'))
+DEBUG = bool(int(config('DEBUG')))
 
 ALLOWED_HOSTS = str(config('ALLOWED_HOSTS')).split(' ')
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR /'static_files'
+STATIC_URL = '/static/'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
