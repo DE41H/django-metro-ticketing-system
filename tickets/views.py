@@ -10,9 +10,10 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Ticket, Wallet
-from .utils import calculate_ticket_price, send_email
-from .forms import WalletBalanceUpdateForm, TicketScanUpdateForm
+from .models import Ticket, Wallet, OTP
+from .utils import calculate_ticket_price, send_email, generate_otp
+from .forms import WalletBalanceUpdateForm, TicketScanUpdateForm, OTPConfirmationForm
+from stations.models import Station
 
 
 # Create your views here.
@@ -22,33 +23,86 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
     model = Ticket
     fields = ['start', 'stop']
     template_name = 'tickets/ticket_purchase_form.html'
-    success_url = '/tickets/my/'
+    success_url = '/tickets/confirm/'
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.instance.user = self.request.user
         start = form.instance.start
         stop = form.instance.stop
-        wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
         if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
             messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
-            return redirect(self.request.path)
+            return self.form_invalid(form)
         elif start == stop:
             messages.error(self.request, 'Start and Destination cannot be the same!')
-            return redirect(self.request.path)
+            return self.form_invalid(form)
         price = calculate_ticket_price(start, stop)
+        self.request.session['pending_data'] = {
+            'start': start.pk,
+            'stop': stop.pk,
+            'price': price
+        }
+        otp = OTP.objects.update_or_create(
+            user=self.request.user,
+            code = generate_otp()
+            )[0]
+        send_email(
+            user_email=self.request.user.email, # type: ignore
+            subject='OTP for Metro Ticket Purchase',
+            message=f'Your OTP Code is {otp.code}'
+        )
+        return redirect('/tickets/confirm/')
+
+
+class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
+    model = OTP
+    form_class = OTPConfirmationForm
+    template_name = 'tickets/confirm_otp_code_form.html'
+    success_url = '/tickets/my/'
+
+    def get(self, request, *args, **kwargs):
+        if 'pending_ticket_data' not in request.session:
+            messages.error(request, 'No pending ticket purchase found.')
+            return redirect('tickets:ticket_purchase')
+        return super().get(request, *args, **kwargs)
+    
+    def form_valid(self, form: Any) -> HttpResponse:
+        user = self.request.user
+        otp_entered = form.cleaned_data['code']
+        pending_data = self.request.session.get('pending_data')
+        if pending_data is None:
+            messages.error(self.request, 'No valid confirmation request found!')
+            return self.form_invalid(form)
+        price = pending_data['price']
+        latest_otp = OTP.objects.filter(user=user, code=otp_entered)
+        if not latest_otp.exists():
+            messages.error(self.request, 'Invalid OTP Code')
+            return self.form_invalid(form)
+        elif latest_otp.expired(): # type: ignore
+            messages.error(self.request, 'OTP Expired!')
+            return self.form_invalid(form)
+        latest_otp.delete()
+        start = Station.objects.get(pk=pending_data['start'])
+        stop = Station.objects.get(pk=pending_data['stop'])
+        wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
         try:
             with transaction.atomic():
-                success = wallet.deduct(Decimal(price))
-                if not success:
+                if not wallet.deduct(Decimal(price)):
                     raise Exception('Insufficient Funds')
-            form.instance.user = self.request.user
-            messages.success(self.request, 'Ticket Purchased Successfully!')
-            return super().form_valid(form)
+                ticket = Ticket.objects.create(
+                    user=user,
+                    start=start,
+                    stop=stop
+                )
+                send_email(
+                    user_email=self.request.user.email, # type: ignore
+                    subject='Ticket Details',
+                    message=f'Ticket ID: {ticket.id}\nStart Station: {ticket.start.name}\nDestination Station: {ticket.stop.name}\nCreated At: {ticket.created_at}'
+                )
+                del self.request.session['pending_data']
+                return redirect('tickets:ticket_list')
         except Exception:
             messages.error(self.request, 'Purchase Failed! Insufficient Wallet Funds')
-            return redirect(self.request.path)
-            
-        
+            return redirect('tickets:wallet_balance_update')
+
 
 class TicketListView(LoginRequiredMixin, generic.ListView):
     model = Ticket
@@ -88,16 +142,15 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         ticket_id = form.cleaned_data.get('ticket_id')
+        
         with transaction.atomic():
             ticket = Ticket.objects.select_for_update().get(id=ticket_id)
             match ticket.status:
                 case Ticket.State.ACTIVE:
-                    ticket.start.footfall = F('footfall') + 1
-                    ticket.start.save(update_fields=['footfall'])
+                    ticket.start.increase_footfall()
                     status = ticket.State.IN_USE
                 case Ticket.State.IN_USE:
-                    ticket.stop.footfall = F('footfall') + 1
-                    ticket.stop.save(update_fields=['footfall'])
+                    ticket.stop.increase_footfall()
                     status = ticket.State.USED
                 case _:
                     messages.error(self.request, 'Ticket is already used or expired.')

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 
 # Create your models here.
 
@@ -21,6 +22,9 @@ class Station(models.Model):
     lines = models.ManyToManyField(to="stations.Line", related_name='stations', blank=True)
     neighbours = models.ManyToManyField(to='self', symmetrical=False, blank=True)
     footfall = models.PositiveBigIntegerField(verbose_name='footfall', default=0)
+
+    def increase_footfall(self):
+        Station.objects.filter(pk=self.pk).update(footfall=F('footfall') + 1)
 
     def __str__(self) -> str:
         return str(self.name)

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import F
+from .utils import generate_otp
 
 # Create your models here.
 
@@ -65,3 +66,16 @@ class Wallet(models.Model):
 
     def __str__(self) -> str:
         return str(self.user)
+    
+
+class OTP(models.Model):
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='otp')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def expired(self) -> bool:
+        expiry = self.created_at + timedelta(minutes=5)
+        return timezone.now() > expiry
+    
+    def __str__(self) -> str:
+        return self.code

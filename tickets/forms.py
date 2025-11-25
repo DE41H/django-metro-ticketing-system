@@ -40,3 +40,7 @@ class TicketScanUpdateForm(forms.ModelForm):
             case Ticket.State.USED:
                 raise forms.ValidationError('Ticket has already been Used!')
         return super().clean()
+
+
+class OTPConfirmationForm(forms.ModelForm):
+    code = forms.CharField(min_length=6, max_length=6)
