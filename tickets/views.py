@@ -11,7 +11,7 @@ from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Ticket, Wallet
-from .utils import calculate_ticket_price
+from .utils import calculate_ticket_price, send_email
 from .forms import WalletBalanceUpdateForm, TicketScanUpdateForm
 
 
