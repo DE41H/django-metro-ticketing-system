@@ -25,7 +25,10 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(config('DEBUG'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = str(config('ALLOWED_HOSTS')).split(' ')
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
