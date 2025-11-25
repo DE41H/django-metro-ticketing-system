@@ -182,6 +182,7 @@ class DashboardTemplateView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'user/dashboard_page.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        Wallet.objects.get_or_create(user=self.request.user)
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
         return context

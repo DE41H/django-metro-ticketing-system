@@ -22,5 +22,6 @@ urlpatterns = [
     path('', RedirectView.as_view(pattern_name='tickets:dashboard', permanent=True)),
     path('admin/', admin.site.urls),
     path('tickets/', include('tickets.urls')),
-    path('stations/', include('stations.urls'))
+    path('stations/', include('stations.urls')),
+    path('accounts/', include('allauth.urls'))
 ]

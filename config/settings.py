@@ -35,10 +35,12 @@ AUTHENTICATION_BACKENDS = [
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = {'email*'}
+SOCIALACCOUNTONLY = True
 ACCOUNT_PASSWORD_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'none' 
 ACCOUNT_SIGNUP_FORM_CLASS = None
 LOGIN_REDIRECT_URL = '/tickets/dashboard/'
+LOGIN_URL = '/accounts/google/login/'
 SITE_ID = 1
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -98,7 +100,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

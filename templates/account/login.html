@@ -1,0 +1,8 @@
+{% load socialaccount %}
+
+<h1>Welcome!</h1>
+<p>Please log in using your Google Account to continue.</p>
+
+<a href="{% provider_login_url 'google' %}?next={{ next }}">
+    <button>Login with Google</button>
+</a>
