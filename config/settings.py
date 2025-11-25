@@ -21,26 +21,59 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_h8&2#mg4!1^y@6_qdgzrr%b*%9l4)kdln9l#qa35uea-7qz4f'
+SECRET_KEY = os.getenv('DJANGO_SECURITY_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = False 
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_PASSWORD_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none' 
+ACCOUNT_SIGNUP_FORM_CLASS = None
+LOGIN_REDIRECT_URL = '/tickets/dashboard/'
+SITE_ID = 1
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.provider.google',
     'stations',
     'tickets'
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {
+            'access_type': 'online'
+        },
+        'APP': {
+            'client_id': os.getenv('CLIENT_ID'),
+            'secret': os.getenv('SECRET'),
+            'key': ''
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
