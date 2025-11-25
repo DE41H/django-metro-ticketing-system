@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECURITY_KEY')
+SECRET_KEY = 'django-insecure-_h8&2#mg4!1^y@6_qdgzrr%b*%9l4)kdln9l#qa35uea-7qz4f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,8 +48,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = 'f20250721@pilani.bits-pilani.ac.in'
+EMAIL_HOST_PASSWORD = 'tvvq iohx nkbm bzcu'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Application definition
@@ -77,8 +77,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online'
         },
         'APP': {
-            'client_id': os.getenv('CLIENT_ID'),
-            'secret': os.getenv('SECRET'),
+            'client_id': 'G0CSPX-2NhNNnKTQkvP-j3h4qXWndC5UINI',
+            'secret': '245509951448-p5c2q1f0p5ktteitfivim1okei6vhuns.apps.googleusercontent.com',
             'key': ''
         }
     }

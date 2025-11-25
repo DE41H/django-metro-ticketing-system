@@ -35,6 +35,9 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
             messages.error(self.request, 'Start and Destination cannot be the same!')
             return self.form_invalid(form)
         price = calculate_ticket_price(start, stop)
+        if price == 0:
+            messages.error(self.request, 'No Route exists between these Stations!')
+            return self.form_invalid(form)
         self.request.session['pending_data'] = {
             'start': start.pk,
             'stop': stop.pk,
@@ -175,7 +178,7 @@ class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
             start=form.instance.start,
             stop=form.instance.stop,
         )
-        self.object = form.save()
+        self.object = ticket
         messages.success(self.request, f'Purchase Successful! Ticket ID is: {ticket.id}')
         return redirect('/tickets/scanner/')
     

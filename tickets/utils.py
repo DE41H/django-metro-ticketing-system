@@ -25,7 +25,7 @@ def send_email(user_email: str, subject: str, message: str) -> None:
         message=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user_email],
-        fail_silently=True
+        fail_silently=False
     )
 
 def generate_otp() -> str:

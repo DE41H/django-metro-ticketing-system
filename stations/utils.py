@@ -12,14 +12,14 @@ from .models import Station, Line
 def calculate_route(start: Station, stop: Station) -> list[Station]:
     if start == stop:
         return [start]
-    all_stations = Station.objects.prefetch_related('neighbours', 'lines').in_bulk([start.pk, stop.pk])
+    stations = {s.pk: s for s in Station.objects.all().prefetch_related('lines', 'neighbours')}
     queue = deque([start])
     parents: dict[Station, Station|None] = {start: None}
     visited = {start}
     while queue:
         current = queue.popleft()
         for neighbour in current.neighbours.all():
-            line = Line.objects.filter(stations__name=current.name, is_running=True).filter(stations__name=neighbour.name).distinct().exists()
+            line = Line.objects.filter(stations__name=current.name, is_running=True).filter(stations__name=neighbour.name, is_running=True).distinct().exists()
             if neighbour not in visited and line: # type: ignore
                 visited.add(neighbour)
                 parents[neighbour] = current
