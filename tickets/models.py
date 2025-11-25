@@ -41,6 +41,13 @@ class Ticket(models.Model):
         else:
             expiry = self.created_at + timedelta(days=2)
             return timezone.now() > expiry
+        
+    @classmethod
+    def bulk_update_ticket_expiry(cls) -> None:
+        cls.objects.filter(
+            raw_status=cls.State.ACTIVE,
+            created_at__lt=timezone.now() - timedelta(days=2)
+        ).update(raw_status=cls.State.EXPIRED)
 
     def __str__(self) -> str:
         return str(self.id)
