@@ -38,12 +38,13 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
         self.request.session['pending_data'] = {
             'start': start.pk,
             'stop': stop.pk,
-            'price': price
+            'price': str(price)
         }
-        otp = OTP.objects.update_or_create(
+        otp = OTP.objects.get_or_create(
             user=self.request.user,
-            code = generate_otp()
             )[0]
+        otp.code = generate_otp()
+        otp.save()
         send_email(
             user_email=self.request.user.email, # type: ignore
             subject='OTP for Metro Ticket Purchase',
@@ -59,7 +60,7 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
     success_url = '/tickets/my/'
 
     def get(self, request, *args, **kwargs):
-        if 'pending_ticket_data' not in request.session:
+        if 'pending_data' not in request.session:
             messages.error(request, 'No pending ticket purchase found.')
             return redirect('tickets:ticket_purchase')
         return super().get(request, *args, **kwargs)
@@ -71,13 +72,14 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
         if pending_data is None:
             messages.error(self.request, 'No valid confirmation request found!')
             return self.form_invalid(form)
-        price = pending_data['price']
-        latest_otp = OTP.objects.filter(user=user, code=otp_entered)
-        if not latest_otp.exists():
+        price = Decimal(pending_data['price'])
+        latest_otp = OTP.objects.filter(user=user, code=otp_entered).first()
+        if latest_otp is None:
             messages.error(self.request, 'Invalid OTP Code')
             return self.form_invalid(form)
         elif latest_otp.expired(): # type: ignore
             messages.error(self.request, 'OTP Expired!')
+            latest_otp.delete()
             return self.form_invalid(form)
         latest_otp.delete()
         start = Station.objects.get(pk=pending_data['start'])
@@ -85,7 +87,7 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
         wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
         try:
             with transaction.atomic():
-                if not wallet.deduct(Decimal(price)):
+                if not wallet.deduct(price):
                     raise Exception('Insufficient Funds')
                 ticket = Ticket.objects.create(
                     user=user,
@@ -131,8 +133,7 @@ class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
         return redirect(self.get_success_url())
     
 
-class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
-    model = Ticket
+class TicketScanUpdateView(UserPassesTestMixin, generic.FormView):
     form_class = TicketScanUpdateForm
     template_name = 'scanner/ticket_scan_update_form.html'
     success_url = '/tickets/scanner/'
@@ -174,8 +175,9 @@ class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
             start=form.instance.start,
             stop=form.instance.stop,
         )
+        self.object = form.save()
         messages.success(self.request, f'Purchase Successful! Ticket ID is: {ticket.id}')
-        return redirect(self.get_success_url())
+        return redirect('/tickets/scanner/')
     
 
 class DashboardTemplateView(LoginRequiredMixin, generic.TemplateView):

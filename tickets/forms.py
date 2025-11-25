@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Any
 from django import forms
-from .models import Wallet, Ticket
+from .models import Wallet, Ticket, OTP
 
 
 class WalletBalanceUpdateForm(forms.ModelForm):
@@ -44,3 +44,7 @@ class TicketScanUpdateForm(forms.ModelForm):
 
 class OTPConfirmationForm(forms.ModelForm):
     code = forms.CharField(min_length=6, max_length=6)
+
+    class Meta:
+        model = OTP
+        fields = ['code']

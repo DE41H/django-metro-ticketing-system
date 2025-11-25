@@ -3,12 +3,11 @@ import networkx as nx
 from collections import deque
 from hashlib import sha512
 from pyvis.network import Network # type: ignore
+from django.conf import settings
 from django.db.models import Value, CharField, F
 from django.db.models.functions import Concat, Cast
 from django.core.cache import cache
 from .models import Station, Line
-
-CWD = os.path.dirname(os.path.abspath(__file__))
 
 def calculate_route(start: Station, stop: Station) -> list[Station]:
     if start == stop:
@@ -53,7 +52,7 @@ def create_map(path: str) -> None:
 
 def get_map() -> str:
     filename = f'{get_hash()}.html'
-    path = os.path.join(CWD, 'maps', filename)
+    path = os.path.join(settings.BASE_DIR, 'templates', 'maps', filename)
     if not os.path.exists(path):
         create_map(path=path)
     return f'maps/{filename}'

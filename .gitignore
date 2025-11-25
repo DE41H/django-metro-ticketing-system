@@ -2,5 +2,6 @@
 .venv/
 .env
 __pycache__/
+lib/
 *.pyc
 db.sqlite3

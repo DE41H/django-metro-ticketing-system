@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Stations</h2>
+  <ul>
+    {% for station in stations %}
+      <li>{{ station.name }}</li>
+    {% empty %}
+      <li>No stations available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

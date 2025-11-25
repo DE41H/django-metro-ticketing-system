@@ -6,7 +6,8 @@ from .views import (
     TicketScanUpdateView, 
     TicketPurchaseOfflineView,
     ScannerTemplateView,
-    DashboardTemplateView
+    DashboardTemplateView,
+    ConfirmTicketPurchase
 )
 
 app_name = 'tickets'
@@ -17,5 +18,6 @@ urlpatterns = [
     path('scanner/scan/', TicketScanUpdateView.as_view(), name='ticket_scan'),
     path('scanner/buy/', TicketPurchaseOfflineView.as_view(), name='ticket_purchase_offline'),
     path('scanner/', ScannerTemplateView.as_view(), name='scanner'),
-    path('dashboard/', DashboardTemplateView.as_view(), name='dashboard')
+    path('dashboard/', DashboardTemplateView.as_view(), name='dashboard'),
+    path('confirm/', ConfirmTicketPurchase.as_view(), name='confirm')
 ]
