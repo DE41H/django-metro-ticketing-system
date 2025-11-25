@@ -31,21 +31,16 @@ class Ticket(models.Model):
         description='Current Status'
     )
     def status(self):
-        raw_status = self.raw_status
-        if raw_status == self.State.ACTIVE and self.expired():
-            self.__class__.objects.filter(pk=self.pk).update(raw_status=self.State.EXPIRED)
-            self.refresh_from_db()
+        if self.raw_status == self.State.ACTIVE and self.expired():
             return self.State.EXPIRED
-        return raw_status # type: ignore
+        return self.raw_status # type: ignore
 
     def expired(self) -> bool:
-        if self.raw_status == self.State.ACTIVE:
+        if self.raw_status in (Ticket.State.USED, Ticket.State.IN_USE):
+            return False
+        else:
             expiry = self.created_at + timedelta(days=2)
             return timezone.now() > expiry
-        elif self.raw_status == self.State.EXPIRED:
-            return True
-        else:
-            return False
 
     def __str__(self) -> str:
         return str(self.id)
@@ -56,12 +51,10 @@ class Wallet(models.Model):
     balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
 
     def deduct(self, amount: Decimal) -> bool:
-        if self.balance < amount:
-            return False
-        else:
-            Wallet.objects.filter(pk=self.pk).update(balance = F('balance') - amount)
-            self.refresh_from_db()
-            return True
+        return bool(Wallet.objects.filter(pk=self.pk, balance__gte=amount).update(balance = F('balance') - amount))
+
+    def add(self, amount: Decimal) -> bool:
+        return bool(Wallet.objects.filter(pk=self.pk).update(balance = F('balance') + amount))
 
     def __str__(self) -> str:
         return str(self.user)

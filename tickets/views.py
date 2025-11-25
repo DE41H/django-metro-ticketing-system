@@ -73,7 +73,7 @@ class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
         amount = form.cleaned_data.get('amount')
-        wallet.deduct(-amount) # type: ignore
+        wallet.add(amount) #type: ignore
         return redirect(self.get_success_url())
     
 
@@ -88,15 +88,21 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.UpdateView):
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         ticket_id = form.cleaned_data.get('ticket_id')
-        ticket = Ticket.objects.get(id=ticket_id)
-        match ticket.status:
-            case Ticket.State.ACTIVE:
-                ticket.start.footfall = F('footfall') + 1
-                ticket.raw_status = ticket.State.IN_USE
-            case Ticket.State.IN_USE:
-                ticket.stop.footfall = F('footfall') + 1
-                ticket.raw_status = ticket.State.USED
-        ticket.save()
+        with transaction.atomic():
+            ticket = Ticket.objects.select_for_update().get(id=ticket_id)
+            match ticket.status:
+                case Ticket.State.ACTIVE:
+                    ticket.start.footfall = F('footfall') + 1
+                    ticket.start.save(update_fields=['footfall'])
+                    status = ticket.State.IN_USE
+                case Ticket.State.IN_USE:
+                    ticket.stop.footfall = F('footfall') + 1
+                    ticket.stop.save(update_fields=['footfall'])
+                    status = ticket.State.USED
+                case _:
+                    messages.error(self.request, 'Ticket is already used or expired.')
+                    return redirect(self.request.path)
+            Ticket.objects.filter(pk=ticket.pk).update(raw_status=status)
         return redirect(self.get_success_url())
     
 
