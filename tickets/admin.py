@@ -19,7 +19,7 @@ class TicketAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user__email', 'start__name', 'stop__name')
     ordering = ('-created_at',)
 
-    def changelist_view(self, request: HttpRequest, extra_context: dict[str, str] | None = ...) -> TemplateResponse: # type: ignore
+    def changelist_view(self, request: HttpRequest, extra_context: dict[str, str] | None = None) -> TemplateResponse: # type: ignore
         Ticket.bulk_update_ticket_expiry()
         return super().changelist_view(request, extra_context)
 
