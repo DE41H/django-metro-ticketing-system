@@ -34,25 +34,15 @@ DEBUG = bool(int(config('DEBUG')))
 
 ALLOWED_HOSTS = str(config('ALLOWED_HOSTS')).split(' ')
 
-# STATIC_ROOT = BASE_DIR /'static_files'
-# STATIC_URL = '/static/'
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
-
 ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = {'email*'}
-SOCIALACCOUNTONLY = True
-ACCOUNT_PASSWORD_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = 'none' 
-ACCOUNT_SIGNUP_FORM_CLASS = None
-LOGIN_REDIRECT_URL = '/tickets/dashboard/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/'
-LOGIN_URL = '/accounts/google/login/'
-SITE_ID = 1
+ACCOUNT_SIGNUP_FIELDS = ['email*']
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
+SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -78,6 +68,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'stations',
     'tickets'
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -134,7 +129,11 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASS'),
         'HOST': config('DB_HOST'),
-        'PORT': int(config('DB_PORT'))
+        'PORT': int(config('DB_PORT')),
+        'OPTIONS': {
+            'options': '-c search_path=public' # <-- Add this line
+        },
+        'CONN_MAX_AGE': 600
     }
 }
 
