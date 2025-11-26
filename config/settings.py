@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('DJANGO_SECRET_KEY')
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = False
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 # SECURE_HSTS_SECONDS = 31536000
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # SECURE_HSTS_PRELOAD = True
@@ -34,8 +34,8 @@ DEBUG = bool(int(config('DEBUG')))
 
 ALLOWED_HOSTS = str(config('ALLOWED_HOSTS')).split(' ')
 
-STATIC_ROOT = BASE_DIR /'static_files'
-STATIC_URL = '/static/'
+# STATIC_ROOT = BASE_DIR /'static_files'
+# STATIC_URL = '/static/'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -49,6 +49,7 @@ ACCOUNT_PASSWORD_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'none' 
 ACCOUNT_SIGNUP_FORM_CLASS = None
 LOGIN_REDIRECT_URL = '/tickets/dashboard/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/'
 LOGIN_URL = '/accounts/google/login/'
 SITE_ID = 1
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -86,8 +87,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online'
         },
         'APP': {
-            'client_id': config('CLIENT_ID'),
-            'secret': config('CLIENT_SECRET'),
+            'client_id': str(config('CLIENT_ID')),
+            'secret': str(config('CLIENT_SECRET')),
             'key': ''
         }
     }
@@ -133,7 +134,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASS'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT')
+        'PORT': int(config('DB_PORT'))
     }
 }
 

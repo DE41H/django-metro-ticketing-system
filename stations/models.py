@@ -7,8 +7,8 @@ from django.db.models import F
 class Line(models.Model):
     name = models.CharField(verbose_name='name', max_length=200, unique=True, primary_key=True)
     color = models.CharField(verbose_name='color', max_length=7, unique=True)
-    allow_ticket_purchase = models.BooleanField(verbose_name='allow_ticket_purchase', default=False)
-    is_running = models.BooleanField(verbose_name='is_running', default=False)
+    allow_ticket_purchase = models.BooleanField(verbose_name='allow_ticket_purchase', default=True)
+    is_running = models.BooleanField(verbose_name='is_running', default=True)
 
     def __str__(self) -> str:
         return str(self.name)

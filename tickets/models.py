@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import F
-from .utils import generate_otp
 
 # Create your models here.
 
@@ -24,7 +23,7 @@ class Ticket(models.Model):
         USED = 'USED', 'Used'
         EXPIRED = 'EXPIRED', 'Expired'
 
-    raw_status = models.CharField(verbose_name='status', max_length=10, choices=State.choices, default=State.ACTIVE)
+    raw_status = models.CharField(verbose_name='status', max_length=11, choices=State.choices, default=State.ACTIVE)
 
     @property
     @admin.display(
