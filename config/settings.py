@@ -30,9 +30,9 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURE_HSTS_PRELOAD = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(config('DEBUG')))
+DEBUG = bool(config('DEBUG', default=False, cast=int))
 
-ALLOWED_HOSTS = str(config('ALLOWED_HOSTS')).split(' ')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=str).split(' ') # type: ignore
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*']
@@ -82,8 +82,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online'
         },
         'APP': {
-            'client_id': str(config('CLIENT_ID')),
-            'secret': str(config('CLIENT_SECRET')),
+            'client_id': config('CLIENT_ID', cast=str),
+            'secret': config('CLIENT_SECRET', cast=str),
             'key': ''
         }
     }
@@ -125,13 +125,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASS'),
-        'HOST': config('DB_HOST'),
-        'PORT': int(config('DB_PORT')),
+        'NAME': config('POSTGRES_DB'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST', default='db'),
+        'PORT': config('POSTGRES_PORT', default=5432, cast=int),
         'OPTIONS': {
-            'options': '-c search_path=public' # <-- Add this line
+            'options': '-c search_path=public'
         },
         'CONN_MAX_AGE': 600
     }

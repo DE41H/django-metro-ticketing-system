@@ -1,0 +1,32 @@
+services:
+  djangometroapp:
+    image: djangometroapp
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    env_file:
+      - .env.dev
+    command: > 
+      sh -c "python manage.py makemigrations && 
+      python manage.py migrate && 
+      python manage.py populate_data && 
+      python manage.py runserver 8080"
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+    env_file:
+      - .env.dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  volumes:
+    postgres_data: 
