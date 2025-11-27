@@ -23,23 +23,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(config('DEBUG', default=False, cast=int))
+DEBUG = bool(int(config('DEBUG', '1')))
 
-ALLOWED_HOSTS = [host for host in config('ALLOWED_HOSTS', cast=str).split(' ') if host] #type: ignore
+ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ') #type: ignore
 
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
+# if not DEBUG:
+#     SESSION_COOKIE_SECURE = True
     
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_HSTS_SECONDS = 31536000
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     SECURE_HSTS_PRELOAD = True
+#     SECURE_SSL_REDIRECT = True
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-    CSRF_COOKIE_SECURE = True
-    CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in  ('localhost', '127.0.0.1')]
+#     CSRF_COOKIE_SECURE = True
+#     CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in  ('localhost', '127.0.0.1')]
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*']
@@ -89,8 +88,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online'
         },
         'APP': {
-            'client_id': config('CLIENT_ID', cast=str),
-            'secret': config('CLIENT_SECRET', cast=str),
+            'client_id': config('CLIENT_ID'),
+            'secret': config('CLIENT_SECRET'),
             'key': ''
         }
     }
@@ -135,8 +134,8 @@ DATABASES = {
         'NAME': config('POSTGRES_DB'),
         'USER': config('POSTGRES_USER'),
         'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('POSTGRES_HOST', default='db'),
-        'PORT': config('POSTGRES_PORT', default=5432, cast=int),
+        'HOST': config('POSTGRES_HOST', 'db'),
+        'PORT': int(config('POSTGRES_PORT', '5432')),
         'OPTIONS': {
             'options': '-c search_path=public'
         },
@@ -177,10 +176,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/app/staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/app/mediafiles'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

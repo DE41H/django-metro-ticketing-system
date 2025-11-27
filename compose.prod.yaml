@@ -1,24 +1,9 @@
 services:
-  web:
-    image: web
-    env_file:
-      - .env.prod
-    build:
-      context: .
-      dockerfile: ./Dockerfile.prod
-    expose:
-      - "8080"
-    depends_on:
-      db:
-        condition: service_healthy
-    command: >
-      "gunicorn --bind 0.0.0.0:8080 config.wsgi:application"
-    volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/mediafiles
-    restart: always
   nginx:
-    image: nginx:alpine
+    build: 
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    command: nginx -g 'daemon off;'
     ports:
       - 80:80
       - 8080:80
@@ -29,6 +14,25 @@ services:
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/mediafiles:ro
     restart: always
+  web:
+    env_file:
+      - .env.prod
+    build:
+      context: .
+      dockerfile: ./Dockerfile.prod
+    expose:
+      - "8080"
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    command: >
+      sh -c "python manage.py makemigrations --no-input && 
+      python manage.py migrate --no-input && 
+      python manage.py collectstatic --no-input && 
+      gunicorn --bind 0.0.0.0:8080 config.wsgi:application"
+    restart: always
   db:
     image: postgres:14-alpine
     env_file:
@@ -38,13 +42,6 @@ services:
     expose:
       - "5432"
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-
 volumes:
   postgres_data:
   static_volume:

@@ -1,6 +1,5 @@
 services:
   web:
-    image: web
     env_file:
       - .env.dev
     build:
@@ -11,11 +10,12 @@ services:
     depends_on:
       - db
     command: > 
-      sh -c "python manage.py flush --no-input &&
+      sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
+      python manage.py flush --no-input &&
       python manage.py makemigrations && 
       python manage.py migrate && 
       python manage.py populate_data &&
-      python manage.py runserver 0.0.0.0:8080"
+      su appuser -c 'gunicorn --bind 0.0.0.0:8080 config.wsgi:application'"
   db:
     image: postgres:14-alpine
     env_file:
