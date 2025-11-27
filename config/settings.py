@@ -21,18 +21,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('DJANGO_SECRET_KEY')
-# SECURE_SSL_REDIRECT = False
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(config('DEBUG', default=False, cast=int))
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=str).split(' ') # type: ignore
+ALLOWED_HOSTS = [host for host in config('ALLOWED_HOSTS', cast=str).split(' ') if host] #type: ignore
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in  ('localhost', '127.0.0.1')]
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*']
@@ -169,7 +176,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/app/staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/app/mediafiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
