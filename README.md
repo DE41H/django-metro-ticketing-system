@@ -24,8 +24,8 @@ The system is deployed using a standard three-tier service architecture defined 
 
 | Service Name | Docker Image | Role in System |
 | :--- | :--- | :--- |
-| **`db`** | `postgres:14-alpine` | Database server. Includes a **`healthcheck`** to report readiness. |
-| **`web`** | Custom Image (built from `Dockerfile.prod`) | Application server running **Gunicorn**. Configured with `depends_on: service_healthy` to **wait** for the database before launching. |
+| **`db`** | `postgres:14-alpine` | Database server. |
+| **`web`** | Custom Image (built from `Dockerfile.prod`) | Application server running **Gunicorn**. Configured to **wait** for the database before launching. |
 | **`nginx`** | `nginx:alpine` | **Reverse Proxy** and **Static/Media File Server**. Handles all external traffic and serves assets directly from volumes. |
 
 #### Data Persistence and Volume Strategy
@@ -54,29 +54,22 @@ All critical data is stored outside the application containers using named Docke
 
     ```ini
     # .env.prod: REQUIRED PARAMETERS
+    DEBUG=1
     
-    # ----------------------------------------------------
-    # CORE DJANGO SETTINGS
-    # ----------------------------------------------------
-    DJANGO_SECRET_KEY=your_long_and_complex_secret_key
-    DEBUG=0
-    # Use your production domain name(s) here, e.g., metro.com
-    DJANGO_ALLOWED_HOSTS=your_domain.com, localhost, 127.0.0.1
+    DJANGO_SECRET_KEY=your-django-secret-key
+    ALLOWED_HOSTS=localhost
     
-    # ----------------------------------------------------
-    # DATABASE CREDENTIALS (POSTGRES)
-    # ----------------------------------------------------
-    POSTGRES_DB=metro_db
-    POSTGRES_USER=metro_user
-    POSTGRES_PASSWORD=secure_db_password
-    POSTGRES_HOST=db  # The Docker Compose service name for the database
+    CLIENT_SECRET=your-google-auth-client-secret
+    CLIENT_ID=your-google-auth-client-id
+    
+    EMAIL_HOST_USER=email-host-email-id
+    EMAIL_HOST_PASSWORD=email-host-app-password
+    
+    POSTGRES_DB=metro_prod_db
+    POSTGRES_PASSWORD=password
+    POSTGRES_USER=metro_prod_user
+    POSTGRES_HOST=db
     POSTGRES_PORT=5432
-    
-    # ----------------------------------------------------
-    # EMAIL SETTINGS (e.g., for Allauth confirmations/resets)
-    # ----------------------------------------------------
-    EMAIL_HOST_USER=your_smtp_username
-    EMAIL_HOST_PASSWORD=your_smtp_password
     
     ```
 
@@ -99,7 +92,7 @@ All critical data is stored outside the application containers using named Docke
         docker compose -f compose.prod.yaml exec web python manage.py createsuperuser
         ```
 
-    3.  **Access:** The application is now running at `http://localhost/`.
+    3.  **Access:** The application is now running at `http://localhost:8080/`.
 
 ---
 
@@ -110,7 +103,6 @@ For local development, we use **Docker Compose** to create a consistent environm
 ### Prerequisites
 
 * Docker and Docker Compose.
-* A separate development Compose file (e.g., `docker-compose.yml`) must exist, mapping your local project directory to `/app` inside the container.
 
 ### Setup Instructions
 
@@ -119,28 +111,34 @@ For local development, we use **Docker Compose** to create a consistent environm
 
     ```ini
     # .env.dev
+    DEBUG=1
+    
+    DJANGO_SECRET_KEY=your-django-secret-key
+    ALLOWED_HOSTS=localhost
+    
+    CLIENT_SECRET=your-google-auth-client-secret
+    CLIENT_ID=your-google-auth-client-id
+    
+    EMAIL_HOST_USER=email-host-email-id
+    EMAIL_HOST_PASSWORD=email-host-app-password
+    
     POSTGRES_DB=metro_dev_db
-    POSTGRES_USER=dev_user
-    POSTGRES_PASSWORD=dev_pass
+    POSTGRES_PASSWORD=password
+    POSTGRES_USER=metro_dev_user
+    POSTGRES_HOST=db
+    POSTGRES_PORT=5432
     ```
 
 2.  **Build and Start Containers:**
-    Assuming your development compose file is named `docker-compose.yml` and exposes a port like `8000:8000`:
 
     ```bash
-    docker compose up --build -d
+    docker compose -f compose.dev.yaml up --build -d
     ```
 
-3.  **One-Time Database Setup:**
+3.  **One-Time Setup:**
     Execute the necessary commands against the running `web` container:
 
     ```bash
-    # Run migrations
-    docker compose exec web python manage.py migrate
-
-    # Populate initial metro data
-    docker compose exec web python manage.py populate_data
-    
     # Create superuser (optional)
     docker compose exec web python manage.py createsuperuser
     ```
