@@ -28,7 +28,6 @@ pure_eval==0.2.3
 pycparser==2.23
 Pygments==2.19.2
 PyJWT==2.10.1
-python-decouple==3.8
 pyvis==0.3.2
 requests==2.32.5
 sqlparse==0.5.3
