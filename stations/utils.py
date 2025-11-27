@@ -6,7 +6,6 @@ from pyvis.network import Network # type: ignore
 from django.conf import settings
 from django.db.models import Value, CharField, F
 from django.db.models.functions import Concat, Cast
-from django.core.cache import cache
 from .models import Station, Line
 
 def calculate_route(start: Station, stop: Station) -> list[Station]:
@@ -50,18 +49,16 @@ def create_map(path: str) -> None:
     net.from_nx(G)
     net.save_graph(path)
 
-def get_map() -> str:
+def get_map_url() -> str:
+    maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
+    os.makedirs(maps_dir, exist_ok=True)
     filename = f'{get_hash()}.html'
-    path = os.path.join(settings.BASE_DIR, 'templates', 'maps', filename)
+    path = os.path.join(maps_dir, filename)
     if not os.path.exists(path):
         create_map(path=path)
-    return f'maps/{filename}'
+    return f'{settings.MEDIA_URL}maps/{filename}'
 
 def get_hash() -> str:
-    KEY = 'metro_config_hash'
-    cached_hash = cache.get(KEY)
-    if cached_hash:
-        return cached_hash
     lines_qs = Line.objects.annotate(
         config_string=Concat(
             Value('LINE_CONF:'), F('name'), Value('|'), F('color'),
@@ -91,5 +88,4 @@ def get_hash() -> str:
     all_config_strings = sorted(list(lines_qs) + list(stations_qs) + list(station_lines_qs) + list(station_neighbors_qs))
     combined_data = '|'.join(all_config_strings).encode('utf-8')
     hash_data = sha512(combined_data).hexdigest()
-    cache.set(KEY, hash_data, timeout=300)
     return hash_data
