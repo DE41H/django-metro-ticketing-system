@@ -10,7 +10,7 @@ from stations.models import Station
 def calculate_ticket_price(start: Station, stop: Station) -> Decimal:
     return Decimal(len(calculate_route(start, stop))) * Decimal(10.0)
 
-def offload_to_thread(func):
+def _parallel(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         thread = Thread(target=func, args=args, kwargs=kwargs)
@@ -18,7 +18,7 @@ def offload_to_thread(func):
         
     return wrapper
 
-@offload_to_thread
+@_parallel
 def send_email(user_email: str, subject: str, message: str) -> None:
     send_mail(
         subject=subject,
