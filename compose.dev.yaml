@@ -2,6 +2,11 @@ services:
   web:
     env_file:
       - .env.dev
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=cache
+      - POSTGRES_PORT=5432
+      - REDIS_PORT=6379
     build:
       context: .
       dockerfile: ./Dockerfile.dev
@@ -9,13 +14,13 @@ services:
       - 8080:8080
     depends_on:
       - db
+      - cache
     command: > 
       sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
-      python manage.py flush --no-input &&
-      python manage.py makemigrations && 
-      python manage.py migrate && 
-      python manage.py populate_data &&
-      su appuser -c 'gunicorn --bind 0.0.0.0:8080 config.wsgi:application'"
+      python manage.py makemigrations --no-input && 
+      python manage.py migrate --no-input && 
+      python manage.py populate_data && 
+      exec su appuser -c 'python manage.py runserver 0.0.0.0:8080'"
   db:
     image: postgres:14-alpine
     env_file:
@@ -24,6 +29,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
+    restart: always
+  cache:
+    image: redis:7-alpine
+    expose:
+      - "6379"
     restart: always
 
 volumes:

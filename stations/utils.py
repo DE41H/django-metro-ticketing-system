@@ -8,17 +8,18 @@ from django.db.models import Max
 from django.utils.dateformat import format
 from .models import Station, Line
 
-graphs = {}
+pkl_filename = 'graph.pkl'
+pkl_path = os.path.join(settings.BASE_DIR, 'data', pkl_filename)
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
     if start == stop:
         return (start, )
+    get_map_url()
     try:
-        graph = nx.node_link_graph(graphs[get_map_url()])
         pk_path = nx.shortest_path(graph, start.pk, stop.pk)
         stations = Station.objects.in_bulk(pk_path)
         return tuple([stations[pk] for pk in pk_path])
-    except nx.NetworkXNoPath:
+    except (nx.NetworkXNoPath):
         return ()
 
 def get_map_url() -> str:
@@ -60,8 +61,9 @@ def get_map_url() -> str:
     url = f'{settings.MEDIA_URL}maps/{filename}'
     if not os.path.exists(path):
         try:
-            with portalocker.Lock(path, mode='w', timeout=60):
-                graphs[url] = nx.node_link_data(_create_map(path=path))
+            with portalocker.Lock(pkl_path, mode='wb', timeout=30):
+                with open(pkl_path, 'wb') as f:
+                    G = _create_map(path=path)
         except portalocker.exceptions.LockException:
             return '/stations/'
     return url

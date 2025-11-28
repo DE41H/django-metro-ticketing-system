@@ -17,6 +17,11 @@ services:
   web:
     env_file:
       - .env.prod
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=cache
+      - POSTGRES_PORT=5432
+      - REDIS_PORT=6379
     build:
       context: .
       dockerfile: ./Dockerfile.prod
@@ -24,14 +29,18 @@ services:
       - "8080"
     depends_on:
       - db
+      - cache
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
     command: >
-      sh -c "python manage.py makemigrations --no-input && 
-      python manage.py migrate --no-input && 
-      python manage.py collectstatic --no-input && 
-      gunicorn --bind 0.0.0.0:8080 config.wsgi:application"
+      sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
+      exec su appuser -c '
+        python manage.py makemigrations --no-input && 
+        python manage.py migrate --no-input && 
+        python manage.py collectstatic --no-input && 
+        gunicorn --bind 0.0.0.0:8080 config.wsgi:application
+      '"
     restart: always
   db:
     image: postgres:14-alpine
@@ -42,6 +51,12 @@ services:
     expose:
       - "5432"
     restart: always
+  cache:
+    image: redis:7-alpine
+    expose:
+     - "6379"
+    restart: always
+
 volumes:
   postgres_data:
   static_volume:
