@@ -17,11 +17,21 @@ class Ticket(models.Model):
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets', null=True)
     created_at = models.DateTimeField(verbose_name='created at', default=timezone.now)
 
+
+    class Meta:
+        verbose_name = 'Ticket'
+        verbose_name_plural = 'Tickets'
+        indexes = [
+            models.Index(fields=['raw_status', 'created_at'])
+        ]
+
+
     class State(models.TextChoices):
         ACTIVE = 'ACTIVE', 'Active'
         IN_USE = 'IN_USE', 'In Use'
         USED = 'USED', 'Used'
         EXPIRED = 'EXPIRED', 'Expired'
+
 
     raw_status = models.CharField(verbose_name='status', max_length=11, choices=State.choices, default=State.ACTIVE)
 
@@ -41,21 +51,27 @@ class Ticket(models.Model):
         else:
             expiry = self.created_at + timedelta(days=2)
             return timezone.now() > expiry
-        
+
+    def __str__(self) -> str:
+        return str(self.id)
+    
     @classmethod
     def bulk_update_ticket_expiry(cls) -> None:
         cls.objects.filter(
             raw_status=cls.State.ACTIVE,
             created_at__lt=timezone.now() - timedelta(days=2)
         ).update(raw_status=cls.State.EXPIRED)
-
-    def __str__(self) -> str:
-        return str(self.id)
     
 
 class Wallet(models.Model):
-    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet')
-    balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet', primary_key=True)
+    balance = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal(0))
+
+
+    class Meta:
+        verbose_name = 'Wallet'
+        verbose_name_plural = 'Wallets'
+
 
     def deduct(self, amount: Decimal) -> bool:
         return bool(Wallet.objects.filter(pk=self.pk, balance__gte=amount).update(balance = F('balance') - amount))
@@ -68,9 +84,14 @@ class Wallet(models.Model):
     
 
 class OTP(models.Model):
-    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='otp')
+    user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='otp', primary_key=True)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = 'OTP'
+        verbose_name_plural = 'OTPs'
+
 
     def expired(self) -> bool:
         expiry = self.created_at + timedelta(minutes=5)
