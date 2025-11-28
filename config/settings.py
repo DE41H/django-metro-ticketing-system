@@ -58,24 +58,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-REDIS_HOST = config('REDIS_HOST')
-REDIS_PORT = config('REDIS_PORT')
-REDIS_PASSWORD = config('REDIS_PASSWORD')
-
 # Application definition
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SERIALIZER": "django_redis.serializers.pickle.PickleSerializer",
-            "KEY_PREFIX": "metro_ticketing_system_cache:"
-        },
-        "TIMEOUT": 60 * 60 * 24,
-    }
-}
 
 INSTALLED_APPS = [
     'django.contrib.admin',

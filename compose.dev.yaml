@@ -4,9 +4,7 @@ services:
       - .env.dev
     environment:
       - POSTGRES_HOST=db
-      - REDIS_HOST=cache
       - POSTGRES_PORT=5432
-      - REDIS_PORT=6379
     build:
       context: .
       dockerfile: ./Dockerfile.dev
@@ -14,7 +12,6 @@ services:
       - 8080:8080
     depends_on:
       - db
-      - cache
     command: > 
       sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
       python manage.py makemigrations --no-input && 
@@ -29,11 +26,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
-    restart: always
-  cache:
-    image: redis:7-alpine
-    expose:
-      - "6379"
     restart: always
 
 volumes:

@@ -8,9 +8,6 @@ from django.db.models import Max
 from django.utils.dateformat import format
 from .models import Station, Line
 
-pkl_filename = 'graph.pkl'
-pkl_path = os.path.join(settings.BASE_DIR, 'data', pkl_filename)
-
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
     if start == stop:
         return (start, )
@@ -61,9 +58,8 @@ def get_map_url() -> str:
     url = f'{settings.MEDIA_URL}maps/{filename}'
     if not os.path.exists(path):
         try:
-            with portalocker.Lock(pkl_path, mode='wb', timeout=30):
-                with open(pkl_path, 'wb') as f:
-                    G = _create_map(path=path)
+            with portalocker.Lock(path, mode='w', timeout=30):
+                G = _create_map(path=path)
         except portalocker.exceptions.LockException:
             return '/stations/'
     return url
