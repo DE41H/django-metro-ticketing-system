@@ -8,15 +8,21 @@ from django.db.models import Max
 from django.utils.dateformat import format
 from .models import Station, Line
 
+maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
+os.makedirs(maps_dir, exist_ok=True)
+
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
     if start == stop:
         return (start, )
-    get_map_url()
+    filename = get_map_url().replace(f'{settings.MEDIA_URL}maps/', '').replace('.html', '.gexf')
+    gexf_path = os.path.join(maps_dir, filename)
     try:
-        pk_path = nx.shortest_path(graph, start.pk, stop.pk)
-        stations = Station.objects.in_bulk(pk_path)
-        return tuple([stations[pk] for pk in pk_path])
-    except (nx.NetworkXNoPath):
+        with portalocker.Lock(gexf_path, mode='r', timeout=10):
+            graph = nx.read_gexf(path=gexf_path)
+            pk_path = nx.shortest_path(graph, start.pk, stop.pk)
+            stations = Station.objects.in_bulk(pk_path)
+            return tuple([stations[pk] for pk in pk_path])
+    except (nx.NetworkXNoPath, portalocker.exceptions.LockException, FileNotFoundError):
         return ()
 
 def get_map_url() -> str:
@@ -49,17 +55,16 @@ def get_map_url() -> str:
         net = Network(height='1000px', width='100%', notebook=True)
         net.from_nx(G)
         net.save_graph(path)
+        nx.write_gexf(G, path.replace('.html', '.gexf'))
         return G
-
-    maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
-    os.makedirs(maps_dir, exist_ok=True)
-    filename = f'{_get_hash()}.html'
-    path = os.path.join(maps_dir, filename)
-    url = f'{settings.MEDIA_URL}maps/{filename}'
-    if not os.path.exists(path):
+    
+    hash_key = f'{_get_hash()}'
+    gexf_path = os.path.join(maps_dir, f'{hash_key}.gexf')
+    html_path = os.path.join(maps_dir, f'{hash_key}.html')
+    if not os.path.exists(gexf_path):
         try:
-            with portalocker.Lock(path, mode='w', timeout=30):
-                G = _create_map(path=path)
+            with portalocker.Lock(gexf_path, mode='w', timeout=30):
+                _create_map(path=html_path)
         except portalocker.exceptions.LockException:
             return '/stations/'
-    return url
+    return f'{settings.MEDIA_URL}maps/{hash_key}.html'
