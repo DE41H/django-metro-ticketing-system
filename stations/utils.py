@@ -1,5 +1,5 @@
 import os
-import threading
+import portalocker
 import networkx as nx
 from hashlib import sha512
 from pyvis.network import Network # type: ignore
@@ -8,7 +8,6 @@ from django.db.models import Max
 from django.utils.dateformat import format
 from .models import Station, Line
 
-lock = threading.Lock()
 graphs = {}
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
@@ -60,5 +59,9 @@ def get_map_url() -> str:
     path = os.path.join(maps_dir, filename)
     url = f'{settings.MEDIA_URL}maps/{filename}'
     if not os.path.exists(path):
-        graphs[url] = nx.node_link_data(_create_map(path=path))
+        try:
+            with portalocker.Lock(path, mode='w', timeout=60):
+                graphs[url] = nx.node_link_data(_create_map(path=path))
+        except portalocker.exceptions.LockException:
+            return '/stations/'
     return url

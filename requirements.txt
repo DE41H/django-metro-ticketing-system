@@ -21,6 +21,7 @@ networkx==3.6
 packaging==25.0
 parso==0.8.5
 pexpect==4.9.0
+portalocker==3.2.0
 prompt_toolkit==3.0.52
 psycopg2-binary==2.9.11
 ptyprocess==0.7.0
