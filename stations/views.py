@@ -12,7 +12,7 @@ class StationListView(generic.ListView):
     model = Station
     template_name = 'stations/station_list.html'
     context_object_name = 'stations'
-    ordering = ['footfall']
+    ordering = ['-footfall', 'name']
 
     def get_queryset(self) -> QuerySet[Any]:
         return Station.objects.prefetch_related('lines', 'neighbours')
