@@ -1,16 +1,22 @@
 from decimal import Decimal
 from typing import Any
 from django import forms
+from django.core.validators import RegexValidator
 from .models import Wallet, Ticket, OTP
+
+_otp_validator = RegexValidator(
+    regex='^[0-9]{6}$',
+    message='Enter a valid OTP code.'
+)
 
 
 class WalletBalanceUpdateForm(forms.ModelForm):
     amount = forms.DecimalField(
         label='Amount to Add',
-        max_digits=19,
+        max_digits=11,
         decimal_places=2,
-        min_value=Decimal(0.01),
-        widget = forms.NumberInput(attrs={'step': '0.01'}),
+        min_value=Decimal(0.5),
+        widget = forms.NumberInput(attrs={'step': '0.5'}),
         required=True
     )
     
@@ -43,7 +49,7 @@ class TicketScanUpdateForm(forms.ModelForm):
 
 
 class OTPConfirmationForm(forms.ModelForm):
-    code = forms.CharField(min_length=6, max_length=6)
+    code = forms.CharField(min_length=6, max_length=6, required=True, validators=[_otp_validator])
 
     class Meta:
         model = OTP
