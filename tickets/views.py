@@ -63,7 +63,7 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
     success_url = '/tickets/my/'
 
     def get(self, request, *args, **kwargs):
-        if 'pending_data' not in request.session:
+        if request.session.get('pending_data') is None:
             messages.error(request, 'No pending ticket purchase found.')
             return redirect('tickets:ticket_purchase')
         return super().get(request, *args, **kwargs)
@@ -75,19 +75,20 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
         if pending_data is None:
             messages.error(self.request, 'No valid confirmation request found!')
             return self.form_invalid(form)
-        price = Decimal(pending_data['price'])
-        latest_otp = OTP.objects.filter(user=user, code=otp_entered).first()
-        if latest_otp is None:
+        otp = OTP.objects.filter(user=user, code=otp_entered).first()
+        if otp is None:
             messages.error(self.request, 'Invalid OTP Code')
             return self.form_invalid(form)
-        elif latest_otp.expired(): # type: ignore
+        elif otp.expired(): # type: ignore
             messages.error(self.request, 'OTP Expired!')
-            latest_otp.delete()
+            otp.delete()
             return self.form_invalid(form)
-        latest_otp.delete()
-        start = Station.objects.get(pk=pending_data['start'])
-        stop = Station.objects.get(pk=pending_data['stop'])
-        wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
+        otp.delete()
+        stations = Station.objects.in_bulk([pending_data['start'], pending_data['stop']])
+        start = stations.get(pending_data['start'])
+        stop = stations.get(pending_data['stop'])
+        price = Decimal(pending_data['price'])
+        wallet = Wallet.objects.get_or_create(user=user)[0]
         try:
             with transaction.atomic():
                 if not wallet.deduct(price):
@@ -116,7 +117,7 @@ class TicketListView(LoginRequiredMixin, generic.ListView):
     ordering = ['-created_at']
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Ticket.objects.select_related('start', 'stop').filter(user=self.request.user) # type: ignore
+        return Ticket.objects.filter(user=self.request.user).select_related('start', 'stop') # type: ignore
     
 
 class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):

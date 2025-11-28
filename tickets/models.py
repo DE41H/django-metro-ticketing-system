@@ -41,11 +41,11 @@ class Ticket(models.Model):
         description='Current Status'
     )
     def status(self):
-        if self.raw_status == self.State.ACTIVE and self.expired():
+        if self.raw_status == self.State.ACTIVE and self._expired():
             return self.State.EXPIRED
         return self.raw_status # type: ignore
 
-    def expired(self) -> bool:
+    def _expired(self) -> bool:
         if self.raw_status in (Ticket.State.USED, Ticket.State.IN_USE):
             return False
         else:
