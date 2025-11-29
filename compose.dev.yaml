@@ -13,11 +13,13 @@ services:
     depends_on:
       - db
     command: > 
-      sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
-      python manage.py makemigrations --no-input && 
+      sh -c "python manage.py makemigrations --no-input && 
       python manage.py migrate --no-input && 
-      python manage.py populate_data && 
-      exec su appuser -c 'python manage.py runserver 0.0.0.0:8080'"
+      python manage.py populate_data && configs:
+      python manage.py runserver 0.0.0.0:8080"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
   db:
     image: postgres:14-alpine
     env_file:
@@ -30,3 +32,5 @@ services:
 
 volumes:
   postgres_data: 
+  static_volume:
+  media_volume:
