@@ -6,7 +6,6 @@ services:
     command: nginx -g 'daemon off;'
     ports:
       - 80:80
-      - 8080:80
     depends_on:
       - web
     volumes:
@@ -31,13 +30,10 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
     command: >
-      sh -c "chown -R appuser:appuser /app/staticfiles /app/mediafiles && 
-      exec su appuser -c '
-        python manage.py makemigrations --no-input && 
-        python manage.py migrate --no-input && 
-        python manage.py collectstatic --no-input && 
-        gunicorn --bind 0.0.0.0:8080 config.wsgi:application
-      '"
+      sh -c "python manage.py makemigrations --no-input && 
+      python manage.py migrate --no-input && 
+      python manage.py collectstatic --no-input && 
+      gunicorn --bind 0.0.0.0:8080 config.wsgi:application"
     restart: always
   db:
     image: postgres:14-alpine
