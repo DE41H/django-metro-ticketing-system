@@ -9,6 +9,6 @@ WORKDIR /app
 COPY requirements.dev.txt .
 RUN python -m pip install --no-cache-dir -r requirements.dev.txt
 
-RUN groupadd -r appgroup && adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser .
+RUN groupadd -r appgroup && adduser -u 5678 --disabled-password --gecos "" appuser
 COPY --chown=appuser:appgroup . .
 USER appuser

@@ -7,12 +7,18 @@ services:
     ports:
       - 80:80
     depends_on:
-      - web
+      web:
+        condition: service_healthy
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/mediafiles:ro
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:80"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
   web:
     env_file:
       - .env.prod
@@ -25,7 +31,8 @@ services:
     expose:
       - "8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
@@ -35,6 +42,11 @@ services:
       python manage.py collectstatic --no-input && 
       gunicorn --bind 0.0.0.0:8080 config.wsgi:application"
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
   db:
     image: postgres:14-alpine
     env_file:
@@ -44,6 +56,11 @@ services:
     expose:
       - "5432"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
