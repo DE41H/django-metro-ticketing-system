@@ -54,7 +54,7 @@ All critical data is stored outside the application containers using named Docke
 
     ```ini
     # .env.prod: REQUIRED PARAMETERS
-    DEBUG=1
+    DEBUG=0
     
     DJANGO_SECRET_KEY=your-django-secret-key
     ALLOWED_HOSTS=localhost
@@ -68,8 +68,6 @@ All critical data is stored outside the application containers using named Docke
     POSTGRES_DB=metro_prod_db
     POSTGRES_PASSWORD=password
     POSTGRES_USER=metro_prod_user
-    POSTGRES_HOST=db
-    POSTGRES_PORT=5432
     
     ```
 
@@ -92,7 +90,7 @@ All critical data is stored outside the application containers using named Docke
         docker compose -f compose.prod.yaml exec web python manage.py createsuperuser
         ```
 
-    3.  **Access:** The application is now running at `http://localhost:8080/`.
+    3.  **Access:** The application is now running at `http://localhost/`.
 
 ---
 
@@ -125,8 +123,6 @@ For local development, we use **Docker Compose** to create a consistent environm
     POSTGRES_DB=metro_dev_db
     POSTGRES_PASSWORD=password
     POSTGRES_USER=metro_dev_user
-    POSTGRES_HOST=db
-    POSTGRES_PORT=5432
     ```
 
 2.  **Build and Start Containers:**
@@ -144,4 +140,4 @@ For local development, we use **Docker Compose** to create a consistent environm
     ```
 
 4.  **Access:**
-    The development server is typically accessible at `http://localhost:8080/`. Changes to your code on your local machine will trigger the server to reload inside the container.
+    The development server is typically accessible at `http://localhost/`. Changes to your code on your local machine will trigger the server to reload inside the container.
