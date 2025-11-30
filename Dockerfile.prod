@@ -1,4 +1,4 @@
-FROM python:3-slim as builder
+FROM python:3-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential libpq-dev gcc && rm -rf /var/lib/apt/lists/*
 
@@ -8,11 +8,11 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.prod.txt .
 
-FROM builder as installer
+FROM builder AS installer
 
 RUN python -m pip install --no-cache-dir -r requirements.prod.txt
 
-FROM python:3-slim as final
+FROM python:3-slim AS final
 
 EXPOSE 8080
 
