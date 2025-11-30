@@ -21,7 +21,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY --from=installer /usr/local/lib/python*/site-packages /usr/local/lib/python*/site-packages
+COPY --from=installer /usr/local/lib/ /usr/local/lib/
+COPY --from=installer /usr/local/bin/ /usr/local/bin/
 
 RUN groupadd -r appgroup && adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser .
 COPY --chown=appuser:appgroup . .
