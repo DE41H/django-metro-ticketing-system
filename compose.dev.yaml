@@ -9,13 +9,13 @@ services:
       context: .
       dockerfile: ./Dockerfile.dev
     ports:
-      - 8080:8080
+      - 80:8080
     depends_on:
       - db
     command: > 
       sh -c "python manage.py makemigrations --no-input && 
       python manage.py migrate --no-input && 
-      python manage.py populate_data && configs:
+      python manage.py populate_data &&
       python manage.py runserver 0.0.0.0:8080"
     volumes:
       - static_volume:/app/staticfiles
