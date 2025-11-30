@@ -2,7 +2,7 @@ import os
 import portalocker
 import networkx as nx
 from hashlib import sha512
-from pyvis.network import Network # type: ignore
+from pyvis.network import Network
 from django.conf import settings
 from django.db.models import Max
 from django.utils.dateformat import format
@@ -51,8 +51,8 @@ def get_map_url() -> str:
                 line = next((l for l in lines), None)
                 if line and line.is_running:
                     color = line.color
-                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True) # type: ignore
-        net = Network(height='1000px', width='100%', notebook=True)
+                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True)
+        net = Network(height='1000px', width='100%', notebook=False, directed=True, cdn_resources='remote')
         net.from_nx(G)
         net.save_graph(path)
         nx.write_gexf(G, path.replace('.html', '.gexf'))
@@ -61,7 +61,7 @@ def get_map_url() -> str:
     hash_key = f'{_get_hash()}'
     gexf_path = os.path.join(maps_dir, f'{hash_key}.gexf')
     html_path = os.path.join(maps_dir, f'{hash_key}.html')
-    if not os.path.exists(gexf_path):
+    if not os.path.exists(gexf_path) or not os.path.exists(html_path):
         try:
             with portalocker.Lock(gexf_path, mode='w', timeout=30):
                 _create_map(path=html_path)
