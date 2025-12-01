@@ -39,7 +39,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ') #type: ignore
 #     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 #     CSRF_COOKIE_SECURE = True
-#     CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in  ('localhost', '127.0.0.1')]
+#     CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
+
+#     ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*']
