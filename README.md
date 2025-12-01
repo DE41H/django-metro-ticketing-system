@@ -56,17 +56,17 @@ All critical data is stored outside the application containers using named Docke
     # .env.prod: REQUIRED PARAMETERS
     DEBUG=0
     
-    DJANGO_SECRET_KEY=your-django-secret-key
-    ALLOWED_HOSTS=localhost
+    DJANGO_SECRET_KEY={your-django-secret-key}
+    ALLOWED_HOSTS=localhost web nginx 127.0.0.0
     
-    CLIENT_SECRET=your-google-auth-client-secret
-    CLIENT_ID=your-google-auth-client-id
+    CLIENT_SECRET={your-google-auth-client-secret}
+    CLIENT_ID={your-google-auth-client-id}
     
-    EMAIL_HOST_USER=email-host-email-id
-    EMAIL_HOST_PASSWORD=email-host-app-password
+    EMAIL_HOST_USER={your-email-host-email-id}
+    EMAIL_HOST_PASSWORD={your-email-host-app-password}
     
     POSTGRES_DB=metro_prod_db
-    POSTGRES_PASSWORD=password
+    POSTGRES_PASSWORD={your-db-password}
     POSTGRES_USER=metro_prod_user
     
     ```
@@ -111,17 +111,17 @@ For local development, we use **Docker Compose** to create a consistent environm
     # .env.dev
     DEBUG=1
     
-    DJANGO_SECRET_KEY=your-django-secret-key
+    DJANGO_SECRET_KEY={your-django-secret-key}
     ALLOWED_HOSTS=localhost
     
-    CLIENT_SECRET=your-google-auth-client-secret
-    CLIENT_ID=your-google-auth-client-id
+    CLIENT_SECRET={your-google-auth-client-secret}
+    CLIENT_ID={your-google-auth-client-id}
     
-    EMAIL_HOST_USER=email-host-email-id
-    EMAIL_HOST_PASSWORD=email-host-app-password
+    EMAIL_HOST_USER={your-email-host-email-id}
+    EMAIL_HOST_PASSWORD={your-email-host-app-password}
     
     POSTGRES_DB=metro_dev_db
-    POSTGRES_PASSWORD=password
+    POSTGRES_PASSWORD={your-db-password}
     POSTGRES_USER=metro_dev_user
     ```
 
