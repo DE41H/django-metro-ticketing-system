@@ -5,3 +5,4 @@ __pycache__/
 lib/
 *.pyc
 db.sqlite3
+releases/
