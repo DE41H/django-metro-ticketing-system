@@ -69,8 +69,8 @@ def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
                 G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True)
     net = Network(height='1000px', width='100%', notebook=False, directed=True, cdn_resources='remote')
     net.from_nx(G)
-    net.save_graph(f'{html_path}.tmp')
-    nx.write_gexf(G, f'{gexf_path}.tmp')
-    os.rename(f'{html_path}.tmp', html_path)
-    os.rename(f'{gexf_path}.tmp', gexf_path)
+    net.save_graph(f'{html_path}_temp.html')
+    nx.write_gexf(G, f'{gexf_path}_temp.gexf')
+    os.rename(f'{html_path}_temp.html', html_path)
+    os.rename(f'{gexf_path}_temp.gexf', gexf_path)
     return G
