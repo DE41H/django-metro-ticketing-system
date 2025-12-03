@@ -37,8 +37,8 @@ def get_map_url() -> str:
         hash_data = sha512(string).hexdigest()
         return hash_data
     
-    def _create_map(path: str) -> nx.DiGraph[str]:
-        G: nx.DiGraph[str] = nx.DiGraph()
+    def _create_map(path: str) -> nx.DiGraph:
+        G: nx.DiGraph = nx.DiGraph()
         all_stations = Station.objects.prefetch_related('lines', 'neighbours')
         for station in all_stations:
             lines = ', '.join([line.name for line in station.lines.all()])
