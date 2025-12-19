@@ -13,11 +13,11 @@ class TicketAdmin(admin.ModelAdmin):
         ('Status', {'fields': ('raw_status',)}),
         ('Details', {'fields': ('id', 'start', 'stop', 'created_at'), 'classes': ('collapse',)})
     )
-    list_display = ('user', 'start', 'stop', 'created_at', 'raw_status')
+    list_display = ('user', 'start', 'stop', 'created_at', 'raw_status', 'price')
     list_select_related = ('user', 'start', 'stop')
     readonly_fields = ('id', 'user', 'created_at')
-    search_fields = ('id', 'user__email', 'start__name', 'stop__name')
-    ordering = ('-created_at',)
+    search_fields = ('id', 'user__email', 'start__name', 'stop__name', 'price')
+    ordering = ('-created_at', 'price')
 
     def changelist_view(self, request: HttpRequest, extra_context: dict[str, str] | None = None) -> TemplateResponse: # type: ignore
         Ticket.bulk_update_ticket_expiry()

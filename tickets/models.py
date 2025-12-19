@@ -35,7 +35,7 @@ class Ticket(models.Model):
         EXPIRED = 'EXPIRED', 'Expired'
 
 
-    raw_status = models.CharField(verbose_name='status', max_length=11, choices=State.choices, default=State.ACTIVE)
+    raw_status = models.CharField(verbose_name='status', max_length=11, choices=State.choices, default=State.ACTIVE, db_index=True)
 
     @property
     @admin.display(

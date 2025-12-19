@@ -100,7 +100,8 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
                 ticket = Ticket.objects.create(
                     user=user,
                     start=start,
-                    stop=stop
+                    stop=stop,
+                    price=price
                 )
                 send_email(
                     user_email=self.request.user.email, # type: ignore
