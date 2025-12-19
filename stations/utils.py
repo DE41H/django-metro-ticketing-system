@@ -8,13 +8,16 @@ from django.db.models import Max
 from django.utils.dateformat import format
 from .models import Station, Line
 
+CACHE = {}
+
 maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
 os.makedirs(maps_dir, exist_ok=True)
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
     if start == stop:
         return (start, )
-    filename = f'{_get_hash()}.gexf'
+    _hash = str(_get_hash())
+    filename = f'{_hash}.gexf'
     gexf_path = os.path.join(maps_dir, filename)
     if not os.path.exists(gexf_path):
         get_map_url()
@@ -22,7 +25,10 @@ def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
         with portalocker.Lock(gexf_path, mode='r', timeout=10):
             if not os.path.exists(gexf_path):
                 raise nx.NetworkXNoPath
-            graph = nx.read_gexf(path=gexf_path)
+            graph = CACHE.get(_hash)
+            if graph is None:
+                graph = nx.read_gexf(path=gexf_path)
+                CACHE[_hash] = graph
             pk_path = nx.shortest_path(graph, start.pk, stop.pk)
             stations = Station.objects.in_bulk(pk_path)
             return tuple([stations[pk] for pk in pk_path])
