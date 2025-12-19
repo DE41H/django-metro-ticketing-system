@@ -15,14 +15,16 @@ class Ticket(models.Model):
     start = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='departing_tickets', verbose_name='start')
     stop = models.ForeignKey(to='stations.Station', on_delete=models.PROTECT, related_name='arriving_tickets', verbose_name='stop')
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets', null=True)
-    created_at = models.DateTimeField(verbose_name='created at', default=timezone.now)
+    created_at = models.DateTimeField(verbose_name='created at', auto_now_add=True)
+    price = models.DecimalField(verbose_name='price', max_digits=11, decimal_places=2)
 
 
     class Meta:
         verbose_name = 'Ticket'
         verbose_name_plural = 'Tickets'
         indexes = [
-            models.Index(fields=['raw_status', 'created_at'])
+            models.Index(fields=['raw_status', 'created_at']),
+            models.Index(fields=['user', 'raw_status', '-created_at'])
         ]
 
 
@@ -85,8 +87,8 @@ class Wallet(models.Model):
 
 class OTP(models.Model):
     user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='otp', primary_key=True)
-    code = models.CharField(max_length=6)
-    created_at = models.DateTimeField(default=timezone.now)
+    code = models.CharField(max_length=6, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'OTP'

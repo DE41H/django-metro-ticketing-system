@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import F
-from django.utils import timezone
 from django.core.validators import RegexValidator
 
 # Create your models here.
@@ -16,16 +15,14 @@ class Line(models.Model):
     color = models.CharField(verbose_name='color', max_length=7, unique=True, validators=[_hex_validator])
     allow_ticket_purchase = models.BooleanField(verbose_name='allow_ticket_purchase', default=True)
     is_running = models.BooleanField(verbose_name='is_running', default=True)
-    updated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
     class Meta:
         verbose_name = 'Line'
         verbose_name_plural = 'Lines'
+        ordering = ['name']
 
-    def save(self, *args, **kwargs) -> None:
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return str(self.name)
@@ -39,17 +36,14 @@ class Station(models.Model):
     lines = models.ManyToManyField(to="stations.Line", related_name='stations', blank=True)
     neighbours = models.ManyToManyField(to='self', symmetrical=False, blank=True)
     footfall = models.PositiveIntegerField(verbose_name='footfall', default=0)
-    updated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
     class Meta:
         verbose_name = 'Station'
         verbose_name_plural = 'Stations'
-    
+        ordering = ['name']
 
-    def save(self, *args, **kwargs) -> None:
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     def increase_footfall(self):
         Station.objects.filter(pk=self.pk).update(footfall=F('footfall') + 1)
