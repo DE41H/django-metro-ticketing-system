@@ -39,7 +39,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SUCURE_HSTS_PRELOAD = True
+    SECURE_HSTS_PRELOAD = True
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*']
@@ -48,7 +48,10 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_LOGOUT_ON_GET = True
-ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SESSION_REMEMBER = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+LOGIN_REDIRECT_URL = '/tickets/dashboard/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -86,7 +89,8 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {
-            'access_type': 'online'
+            'access_type': 'online',
+            'prompt': 'select_account'
         },
         'APP': {
             'client_id': config('CLIENT_ID'),
