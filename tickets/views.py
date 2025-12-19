@@ -38,6 +38,10 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
         if price == 0:
             messages.error(self.request, 'No Route exists between these Stations!')
             return self.form_invalid(form)
+        wallet = Wallet.objects.get_or_create(user=self.request.user)[0]
+        if wallet.balance < price:
+            messages.error(self.request, 'Insufficient wallet funds for the above route!')
+            return self.form_invalid(form)
         self.request.session['pending_data'] = {
             'start': start.pk,
             'stop': stop.pk,
