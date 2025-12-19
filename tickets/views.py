@@ -92,9 +92,9 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
         start = stations.get(pending_data['start'])
         stop = stations.get(pending_data['stop'])
         price = Decimal(pending_data['price'])
-        wallet = Wallet.objects.get_or_create(user=user)[0]
         try:
             with transaction.atomic():
+                wallet = Wallet.objects.select_for_update().get_or_create(user=user)[0]
                 if not wallet.deduct(price):
                     raise Exception('Insufficient Funds')
                 ticket = Ticket.objects.create(
