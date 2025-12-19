@@ -1,4 +1,3 @@
-from typing import Iterable
 from django.db import models
 from django.db.models import F
 from django.utils import timezone
@@ -24,6 +23,9 @@ class Line(models.Model):
         verbose_name = 'Line'
         verbose_name_plural = 'Lines'
 
+    def save(self, *args, **kwargs) -> None:
+        self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return str(self.name)
@@ -44,6 +46,10 @@ class Station(models.Model):
         verbose_name = 'Station'
         verbose_name_plural = 'Stations'
     
+
+    def save(self, *args, **kwargs) -> None:
+        self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     def increase_footfall(self):
         Station.objects.filter(pk=self.pk).update(footfall=F('footfall') + 1)
