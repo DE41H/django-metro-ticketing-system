@@ -25,7 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tickets/', include('tickets.urls')),
     path('stations/', include('stations.urls')),
-    path('accounts/', include('allauth.urls'))
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.socialaccount.urls'))
 ]
 
 if settings.DEBUG:
