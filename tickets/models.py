@@ -75,11 +75,15 @@ class Wallet(models.Model):
         verbose_name_plural = 'Wallets'
 
 
-    def deduct(self, amount: Decimal) -> bool:
-        return bool(Wallet.objects.filter(pk=self.pk, balance__gte=amount).update(balance = F('balance') - amount))
+    def deduct(self, amount: Decimal):
+        success = bool(Wallet.objects.filter(pk=self.pk, balance__gte=amount).update(balance = F('balance') - amount))
+        self.refresh_from_db()
+        return success
 
     def add(self, amount: Decimal) -> bool:
-        return bool(Wallet.objects.filter(pk=self.pk).update(balance = F('balance') + amount))
+        success = bool(Wallet.objects.filter(pk=self.pk).update(balance = F('balance') + amount))
+        self.refresh_from_db()
+        return success
 
     def __str__(self) -> str:
         return str(self.user)
