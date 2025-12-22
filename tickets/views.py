@@ -183,6 +183,7 @@ class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
             user=None,
             start=form.instance.start,
             stop=form.instance.stop,
+            price=calculate_ticket_price(form.instance.start, form.instance.stop)
         )
         self.object = ticket
         messages.success(self.request, f'Purchase Successful! Ticket ID is: {ticket.id}')
