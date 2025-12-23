@@ -15,7 +15,7 @@ class Line(models.Model):
     color = models.CharField(verbose_name='color', max_length=7, unique=True, validators=[_hex_validator])
     allow_ticket_purchase = models.BooleanField(verbose_name='allow_ticket_purchase', default=True)
     is_running = models.BooleanField(verbose_name='is_running', default=True)
-    updated = models.BooleanField(verbose_name='updated', default=False)
+    updated = models.BooleanField(verbose_name='updated', default=True)
 
 
     class Meta:
@@ -36,7 +36,7 @@ class Station(models.Model):
     lines = models.ManyToManyField(to="stations.Line", related_name='stations', blank=True)
     neighbours = models.ManyToManyField(to='self', symmetrical=False, blank=True)
     footfall = models.PositiveIntegerField(verbose_name='footfall', default=0)
-    updated = models.BooleanField(verbose_name='updated', default=False)
+    updated = models.BooleanField(verbose_name='updated', default=True)
 
 
     class Meta:
