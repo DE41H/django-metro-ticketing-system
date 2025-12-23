@@ -80,7 +80,7 @@ def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
                     G[neighbour.pk][station.pk]['arrows'] = 'to;from'
                 else:
                     color = line.color
-                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth={'type': 'continuous', 'roundness': 0}, arrows='to')
+                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth={'type': 'cubicBezier', 'roundness': 0.4}, arrows='to')
     net = Network(height='1000px', width='100%', notebook=False, directed=True, cdn_resources='remote', select_menu=True, filter_menu=True)
     net.from_nx(G)
     net.save_graph(f'{html_path}_temp.html')
