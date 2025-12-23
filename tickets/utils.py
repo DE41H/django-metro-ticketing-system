@@ -8,7 +8,11 @@ from stations.utils import calculate_route
 from stations.models import Station
 
 def calculate_ticket_price(start: Station, stop: Station) -> Decimal:
-    return Decimal(len(calculate_route(start, stop))) * Decimal(10.0)
+    if start == stop:
+        return Decimal('0.00')
+    path = calculate_route(start, stop)
+    length = len(path) - 1
+    return Decimal(length) * Decimal(10.0)
 
 def _parallel(func):
     @wraps(func)
