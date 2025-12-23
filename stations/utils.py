@@ -62,18 +62,26 @@ def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
     G: nx.DiGraph = nx.DiGraph()
     all_stations = Station.objects.prefetch_related('lines', 'neighbours', 'neighbours__lines')
     all_station_lines = {}
+    groups = ('Isolated Stations', 'Terminal Stations', 'Standard Stations', 'Interchange Hubs')
     for station in all_stations:
         all_station_lines[station.pk] = set(station.lines.all())
+        count = station.neighbours.all().count()
+        if count > 3:
+            count = 3
+        group = groups[count]
         lines = ', '.join([line.name for line in all_station_lines[station.pk]])
-        G.add_node(station.pk, label=station.name, title=f'Lines: {lines}', shape='dot', size=12, font={'size': 30, 'vadjust': 5})
+        G.add_node(station.pk, label=station.name, title=f'Lines: {lines}', shape='dot', size=12, font={'size': 30, 'vadjust': 5}, group=group)
     for station in all_stations:
         for neighbour in station.neighbours.all():
             lines = all_station_lines[station.pk] & all_station_lines[neighbour.pk]
             line = next((l for l in lines if l.is_running), None)
             if line:
-                color = line.color
-                G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True)
-    net = Network(height='1000px', width='100%', notebook=False, directed=True, cdn_resources='remote')
+                if G.has_edge(neighbour.pk, station.pk):
+                    G[neighbour.pk][station.pk]['arrows'] = 'to;from'
+                else:
+                    color = line.color
+                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth={'type': 'continuous', 'roundness': 0}, arrows='to')
+    net = Network(height='1000px', width='100%', notebook=False, directed=True, cdn_resources='remote', select_menu=True, filter_menu=True)
     net.from_nx(G)
     net.save_graph(f'{html_path}_temp.html')
     nx.write_gexf(G, f'{gexf_path}_temp.gexf')
