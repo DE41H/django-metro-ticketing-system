@@ -1,18 +1,15 @@
 import os
 import portalocker
 import networkx as nx
-from hashlib import sha512
 from pyvis.network import Network
 from django.conf import settings
-from django.db.models import Max
-from django.utils.dateformat import format
 from .models import Station, Line
 
 CACHE = {}
 
 maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
-html_path = os.path.join(maps_dir, f'graph.html')
 os.makedirs(maps_dir, exist_ok=True)
+html_path = os.path.join(maps_dir, f'graph.html')
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
     try:

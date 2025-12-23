@@ -1,7 +1,6 @@
 from typing import Any
 from decimal import Decimal
 from django.db import transaction
-from django.db.models import F
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.forms import BaseModelForm
