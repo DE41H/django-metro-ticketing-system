@@ -91,19 +91,6 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
         start = stations.get(pending_data['start'])
         stop = stations.get(pending_data['stop'])
         price = Decimal(pending_data['price'])
-        if start is None or stop is None or price is None:
-            messages.error(self.request, 'Invalid confirmation request!')
-            return self.form_invalid(form)
-        if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
-            messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
-            return self.form_invalid(form)
-        elif start == stop:
-            messages.error(self.request, 'Start and Destination cannot be the same!')
-            return self.form_invalid(form)
-        price = calculate_ticket_price(start, stop)
-        if price == 0:
-            messages.error(self.request, 'No Route exists between these Stations!')
-            return self.form_invalid(form)
         try:
             with transaction.atomic():
                 wallet = Wallet.objects.select_for_update().get_or_create(user=user)[0]
@@ -191,11 +178,27 @@ class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
         return self.request.user.is_staff
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        start = form.instance.start
+        stop = form.instance.stop
+        price = calculate_ticket_price(start, stop)
+        if start is None or stop is None or price is None:
+            messages.error(self.request, 'Invalid confirmation request!')
+            return self.form_invalid(form)
+        if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
+            return self.form_invalid(form)
+        elif start == stop:
+            messages.error(self.request, 'Start and Destination cannot be the same!')
+            return self.form_invalid(form)
+        price = calculate_ticket_price(start, stop)
+        if price == 0:
+            messages.error(self.request, 'No Route exists between these Stations!')
+            return self.form_invalid(form)
         ticket = Ticket.objects.create(
             user=None,
-            start=form.instance.start,
-            stop=form.instance.stop,
-            price=calculate_ticket_price(form.instance.start, form.instance.stop)
+            start=start,
+            stop=stop,
+            price=price
         )
         self.object = ticket
         messages.success(self.request, f'Purchase Successful! Ticket ID is: {ticket.id}')
