@@ -47,7 +47,6 @@ class Station(models.Model):
 
     def increase_footfall(self):
         Station.objects.filter(pk=self.pk).update(footfall=F('footfall') + 1)
-        self.refresh_from_db()
 
     def __str__(self) -> str:
         return str(self.name)
