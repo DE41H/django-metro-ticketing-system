@@ -11,54 +11,39 @@ from .models import Station, Line
 CACHE = {}
 
 maps_dir = os.path.join(settings.MEDIA_ROOT, 'maps')
+html_path = os.path.join(maps_dir, f'graph.html')
 os.makedirs(maps_dir, exist_ok=True)
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
-    if start == stop:
-        return (start, )
-    _hash = str(_get_hash())
-    filename = f'{_hash}.gexf'
-    gexf_path = os.path.join(maps_dir, filename)
-    if not os.path.exists(gexf_path):
-        get_map_url()
     try:
-        with portalocker.Lock(gexf_path, mode='r', timeout=10):
-            if not os.path.exists(gexf_path):
-                raise nx.NetworkXNoPath
-            graph = CACHE.get(_hash)
-            if graph is None:
-                graph = nx.read_gexf(path=gexf_path)
-                CACHE[_hash] = graph
-            pk_path = nx.shortest_path(graph, start.pk, stop.pk)
-            stations = Station.objects.in_bulk(pk_path)
-            return tuple([stations[pk] for pk in pk_path])
+        graph = _create_map()
+        pk_path = nx.shortest_path(graph, start.pk, stop.pk)
+        stations = Station.objects.in_bulk(pk_path)
+        return tuple([stations[pk] for pk in pk_path])
     except (nx.NetworkXNoPath, portalocker.exceptions.LockException, FileNotFoundError):
         return ()
 
 def get_map_url() -> str:
-    hash_key = f'{_get_hash()}'
-    gexf_path = os.path.join(maps_dir, f'{hash_key}.gexf')
-    html_path = os.path.join(maps_dir, f'{hash_key}.html')
-    if not os.path.exists(gexf_path) or not os.path.exists(html_path):
+    if not os.path.exists(html_path):
         try:
-            with portalocker.Lock(gexf_path, mode='w', timeout=30):
-                _create_map(html_path=html_path, gexf_path=gexf_path)
+            with portalocker.Lock(html_path, mode='w', timeout=30):
+                _create_map()
         except portalocker.exceptions.LockException:
-            return '/stations/'
-    return f'{settings.MEDIA_URL}maps/{hash_key}.html'
+            return '/stations/list/'
+    return f'{settings.MEDIA_URL}maps/graph.html'
 
-def _get_hash() -> str:
-    latest_station_update = Station.objects.all().aggregate(Max('updated_at'))['updated_at__max']
-    latest_line_update = Line.objects.all().aggregate(Max('updated_at'))['updated_at__max']
-    updates = [u for u in [latest_station_update, latest_line_update] if u]
-    if not updates:
-        return sha512(b"EMPTY_MAP").hexdigest()
-    latest_update = max(updates)
-    string = format(latest_update, 'MAP_CONFIG:%Y-%m-%d H:i:s.u').encode('utf-8')
-    hash_data = sha512(string).hexdigest()
-    return hash_data
+def _is_updated() -> bool:
+    updated_stations = Station.objects.filter(updated=True)
+    updated_lines = Line.objects.filter(updated=True)
+    if not updated_lines.exists() and not updated_stations.exists():
+        return False
+    updated_stations.update(updated=False)
+    updated_lines.update(updated=False)
+    return True
 
-def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
+def _create_map() -> nx.DiGraph:
+    if not _is_updated():
+        return CACHE['graph']
     G: nx.DiGraph = nx.DiGraph()
     all_stations = Station.objects.prefetch_related('lines', 'neighbours', 'neighbours__lines')
     all_station_lines = {}
@@ -90,8 +75,6 @@ def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
         spring_strength=0.08
     )
     net.toggle_physics(True)
-    net.save_graph(f'{html_path}_temp.html')
-    nx.write_gexf(G, f'{gexf_path}_temp.gexf')
-    os.rename(f'{html_path}_temp.html', html_path)
-    os.rename(f'{gexf_path}_temp.gexf', gexf_path)
+    net.save_graph(f'{html_path}.tmp.html')
+    os.replace(f'{html_path}.tmp.html', html_path)
     return G
