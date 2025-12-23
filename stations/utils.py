@@ -65,7 +65,7 @@ def _create_map(html_path: str, gexf_path: str) -> nx.DiGraph:
     groups = ('Isolated Stations', 'Terminal Stations', 'Standard Stations', 'Interchange Hubs')
     for station in all_stations:
         all_station_lines[station.pk] = set(station.lines.all())
-        count = station.neighbours.all().count()
+        count = len(station.neighbours.all())
         if count > 3:
             count = 3
         group = groups[count]
