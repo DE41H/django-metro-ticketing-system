@@ -17,7 +17,7 @@ def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
         pk_path = nx.shortest_path(graph, start.pk, stop.pk)
         stations = Station.objects.in_bulk(pk_path)
         return tuple([stations[pk] for pk in pk_path if pk in stations])
-    except (nx.NetworkXNoPath, portalocker.exceptions.LockException, FileNotFoundError):
+    except nx.NetworkXNoPath:
         return ()
 
 def get_map_url() -> str:
@@ -66,12 +66,16 @@ def _create_graph() -> nx.DiGraph:
         for neighbour in station.neighbours.all():
             lines = all_station_lines[station.pk] & all_station_lines[neighbour.pk]
             line = next((l for l in lines if l.is_running), None)
+            
             if line:
+                color = line.color
+                G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True)
                 if G.has_edge(neighbour.pk, station.pk):
                     G[neighbour.pk][station.pk]['arrows'] = 'to;from'
+                    G[station.pk][neighbour.pk]['hidden'] = True
                 else:
-                    color = line.color
-                    G.add_edge(station.pk, neighbour.pk, color=color, width=8, smooth=True, arrows='to')
+                    G[station.pk][neighbour.pk]['arrows'] = 'to'
+                    G[station.pk][neighbour.pk]['hidden'] = False
     return G
 
 def _save_graph():

@@ -12,6 +12,8 @@ def calculate_ticket_price(start: Station, stop: Station) -> Decimal:
         return Decimal('0.00')
     path = calculate_route(start, stop)
     length = len(path) - 1
+    if length == -1:
+        return Decimal('0.00')
     return Decimal(length) * Decimal(10.0)
 
 def _parallel(func):
