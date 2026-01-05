@@ -156,10 +156,8 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.FormView):
             ticket = Ticket.objects.select_for_update().get(id=ticket_id)
             match ticket.status:
                 case Ticket.State.ACTIVE:
-                    ticket.start.increase_footfall()
                     status = ticket.State.IN_USE
                 case Ticket.State.IN_USE:
-                    ticket.stop.increase_footfall()
                     status = ticket.State.USED
                 case _:
                     messages.error(self.request, 'Ticket is already used or expired.')

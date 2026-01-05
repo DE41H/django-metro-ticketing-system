@@ -9,10 +9,10 @@ from .models import Station, Line
 @admin.register(Station)
 class StationAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('name', 'footfall')}),
+        (None, {'fields': ('name', )}),
         ('Relationships', {'fields': ('lines', 'neighbours')})
     )
-    list_display = ('name', 'footfall')
+    list_display = ('name',)
     search_fields = ('name',)
     filter_horizontal = ('lines', 'neighbours')
 

@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import F
 from django.core.validators import RegexValidator
+from django.contrib import admin
+from django.utils import timezone
+from tickets.models import Ticket
 
 # Create your models here.
 
@@ -35,7 +38,6 @@ class Station(models.Model):
     name = models.CharField(verbose_name='name', max_length=200, unique=True, primary_key=True)
     lines = models.ManyToManyField(to="stations.Line", related_name='stations', blank=True)
     neighbours = models.ManyToManyField(to='self', symmetrical=False, blank=True)
-    footfall = models.PositiveIntegerField(verbose_name='footfall', default=0)
     updated = models.BooleanField(verbose_name='updated', default=True)
 
 
@@ -45,8 +47,14 @@ class Station(models.Model):
         ordering = ['name']
 
 
-    def increase_footfall(self):
-        Station.objects.filter(pk=self.pk).update(footfall=F('footfall') + 1)
+    @property
+    @admin.display(
+        ordering='name',
+        description='Daily Footfall'
+    )
+    def footfall(self) -> int:
+        today = timezone.localdate(timezone.now())
+        return Ticket.objects.filter(created_at__date=today).filter(models.Q(start=self) | models.Q(stop=self)).count()
 
     def __str__(self) -> str:
         return str(self.name)
