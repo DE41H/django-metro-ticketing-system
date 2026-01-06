@@ -141,7 +141,7 @@ class WalletBalanceUpdateView(LoginRequiredMixin, generic.FormView):
         return redirect(self.get_success_url())
     
 
-class TicketScanUpdateView(UserPassesTestMixin, generic.FormView):
+class TicketScanUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.FormView):
     form_class = TicketScanUpdateForm
     template_name = 'scanner/ticket_scan_update_form.html'
     success_url = '/tickets/scanner/'
@@ -166,7 +166,7 @@ class TicketScanUpdateView(UserPassesTestMixin, generic.FormView):
         return redirect(self.get_success_url())
     
 
-class TicketPurchaseOfflineView(UserPassesTestMixin, generic.CreateView):
+class TicketPurchaseOfflineView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Ticket
     fields = ['start', 'stop']
     template_name = 'scanner/ticket_purchase_offline_form.html'
@@ -213,7 +213,7 @@ class DashboardTemplateView(LoginRequiredMixin, generic.TemplateView):
         return context
 
 
-class ScannerTemplateView(UserPassesTestMixin, generic.TemplateView):
+class ScannerTemplateView(LoginRequiredMixin, UserPassesTestMixin, generic.TemplateView):
     template_name = 'scanner/scanner_page.html'
 
     def test_func(self) -> bool | None:

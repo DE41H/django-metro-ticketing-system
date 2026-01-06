@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F
 from django.core.validators import RegexValidator
 from django.contrib import admin
@@ -26,6 +26,18 @@ class Line(models.Model):
         verbose_name_plural = 'Lines'
         ordering = ['name']
 
+    
+    def toggle_running(self) -> None:
+        with transaction.atomic():
+            line = self.__class__.objects.select_for_update().get(pk=self.pk)
+            line.is_running = not line.is_running
+            line.save(update_fields=['is_running'])
+
+    def toggle_ticket_purchase(self) -> None:
+        with transaction.atomic():
+            line = self.__class__.objects.select_for_update().get(pk=self.pk)
+            line.allow_ticket_purchase = not line.allow_ticket_purchase
+            line.save(update_fields=['allow_ticket_purchase'])
 
     def __str__(self) -> str:
         return str(self.name)
