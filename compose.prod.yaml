@@ -1,21 +1,24 @@
 services:
   nginx:
-    build: 
+    container_name: metro_nginx
+    build:
       context: ./nginx
       dockerfile: ./Dockerfile
     command: nginx -g 'daemon off;'
-    ports:
-      - 80:80
-      - 443:443
+    expose:
+      - "8001"
     depends_on:
       - web
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/mediafiles:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     restart: always
+    networks:
+      - private
+      - web-gateway
   web:
+    container_name: metro_web
     env_file:
       - .env.prod
     environment:
@@ -38,7 +41,10 @@ services:
       python manage.py collectstatic --no-input && 
       gunicorn config.wsgi:application --bind 0.0.0.0:8080 --workers 3 --max-requests 500 --max-requests-jitter 50"
     restart: always
+    networks:
+      - private
   db:
+    container_name: metro_db
     image: postgres:14-alpine
     env_file:
       - .env.prod
@@ -52,8 +58,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - private
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+
+networks:
+  web-gateway:
+    external: true
+  private:
+    driver: bridge
