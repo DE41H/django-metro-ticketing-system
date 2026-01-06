@@ -6,8 +6,9 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Station, Line
-from .utils import get_map_url
+from stations.models import Station, Line
+from stations.forms import StationForm, LineForm
+from stations.utils import get_map_url
 
 # Create your views here.
 
@@ -36,7 +37,7 @@ class MapRedirectView(generic.RedirectView):
 
 class StationCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Station
-    fields = ['name', 'lines', 'neighbours']
+    form_class = StationForm
     template_name = 'stations/station_create.html'
     success_url = reverse_lazy('stations:list')
 
@@ -55,11 +56,11 @@ class StationDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteV
 
 class LineCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Line
-    fields = ['name', 'color']
+    form_class = LineForm
     template_name = 'stations/line_create.html'
     
     def get_success_url(self) -> str:
-        return reverse_lazy('stations:create')
+        return reverse_lazy('stations:list')
 
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
@@ -70,7 +71,7 @@ class LineDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView
     template_name = 'stations/line_delete.html'
 
     def get_success_url(self) -> str:
-        return reverse_lazy('stations:create')
+        return reverse_lazy('stations:list')
     
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
