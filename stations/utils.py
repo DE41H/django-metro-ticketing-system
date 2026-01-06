@@ -78,6 +78,7 @@ def _create_graph() -> nx.DiGraph:
                 else:
                     G[station.pk][neighbour.pk]['arrows'] = 'to'
                     G[station.pk][neighbour.pk]['hidden'] = False
+    G.remove_nodes_from(nx.isolates(G))
     return G
 
 def _save_graph():
