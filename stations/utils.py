@@ -1,4 +1,5 @@
 import os
+import time
 import portalocker
 import networkx as nx
 from pyvis.network import Network
@@ -23,13 +24,14 @@ def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
 def get_map_url() -> str:
     if not os.path.exists(HTML_PATH) or _is_updated():
         try:
-            with portalocker.Lock(HTML_PATH, mode='w', timeout=30):
+            with portalocker.Lock(HTML_PATH, mode='a', timeout=30):
                 if not os.path.exists(HTML_PATH) or _is_updated():
                     _save_graph()
                     _reset_updated()
         except portalocker.exceptions.LockException:
             return '/stations/list/'
-    return f'{settings.MEDIA_URL}maps/graph.html'
+    timestamp = int(time.time())
+    return f'{settings.MEDIA_URL}maps/graph.html?v={timestamp}'
 
 def _is_updated() -> bool:
     updated_stations = Station.objects.filter(updated=True)
