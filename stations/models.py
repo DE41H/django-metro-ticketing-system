@@ -1,3 +1,4 @@
+from typing import Iterable
 from django.db import models, transaction
 from django.db.models import F
 from django.core.validators import RegexValidator
@@ -39,6 +40,17 @@ class Line(models.Model):
             line.allow_ticket_purchase = not line.allow_ticket_purchase
             line.save(update_fields=['allow_ticket_purchase'])
 
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
+        self.__class__.objects.filter().select_for_update().update(updated=True)
+        return super().delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        with transaction.atomic():
+            obj = self.__class__.objects.select_for_update().get(pk=self.pk)
+            obj.updated = True
+            obj.save(update_fields=['updated'])
+
     def __str__(self) -> str:
         return str(self.name)
     
@@ -67,6 +79,17 @@ class Station(models.Model):
     def footfall(self) -> int:
         today = timezone.localdate(timezone.now())
         return Ticket.objects.filter(created_at__date=today).filter(models.Q(start=self) | models.Q(stop=self)).count()
+    
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
+        self.__class__.objects.filter().select_for_update().update(updated=True)
+        return super().delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        with transaction.atomic():
+            obj = self.__class__.objects.select_for_update().get(pk=self.pk)
+            obj.updated = True
+            obj.save(update_fields=['updated'])
 
     def __str__(self) -> str:
         return str(self.name)
