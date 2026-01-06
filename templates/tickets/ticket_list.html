@@ -12,7 +12,7 @@
                     <th>ID</th>
                     <th>From</th>
                     <th>To</th>
-                    <th>Status</th>
+                    <th>Price</th> <th>Status</th>
                     <th>Purchased On</th>
                 </tr>
             </thead>
@@ -22,6 +22,9 @@
                     <td>{{ ticket.id|truncatechars:8 }}</td>
                     <td>{{ ticket.start.name }}</td>
                     <td>{{ ticket.stop.name }}</td>
+                    
+                    <td>{{ ticket.price }}</td> 
+                    
                     <td><strong>{{ ticket.get_raw_status_display }}</strong></td>
                     <td>{{ ticket.created_at|date:"M d, Y H:i" }}</td>
                 </tr>

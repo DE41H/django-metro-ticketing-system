@@ -105,7 +105,7 @@ class ConfirmTicketPurchase(LoginRequiredMixin, generic.FormView):
                 send_email(
                     user_email=self.request.user.email, # type: ignore
                     subject='Ticket Details',
-                    message=f'Ticket ID: {ticket.id}\nStart Station: {ticket.start.name}\nDestination Station: {ticket.stop.name}\nCreated At: {ticket.created_at}'
+                    message=f'Ticket ID: {ticket.id}\nStart Station: {ticket.start.name}\nDestination Station: {ticket.stop.name}\nCreated At: {ticket.created_at}\nPrice: {ticket.price}'
                 )
                 del self.request.session['pending_data']
                 return redirect('tickets:ticket_list')

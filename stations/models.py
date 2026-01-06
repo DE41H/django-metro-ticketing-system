@@ -41,15 +41,12 @@ class Line(models.Model):
             line.save(update_fields=['allow_ticket_purchase'])
 
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
-        self.__class__.objects.filter().select_for_update().update(updated=True)
+        self.__class__.objects.all().update(updated=True)
         return super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
+        self.updated = True
         super().save(*args, **kwargs)
-        with transaction.atomic():
-            obj = self.__class__.objects.select_for_update().get(pk=self.pk)
-            obj.updated = True
-            obj.save(update_fields=['updated'])
 
     def __str__(self) -> str:
         return str(self.name)
@@ -81,15 +78,12 @@ class Station(models.Model):
         return Ticket.objects.filter(created_at__date=today).filter(models.Q(start=self) | models.Q(stop=self)).count()
     
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
-        self.__class__.objects.filter().select_for_update().update(updated=True)
+        self.__class__.objects.all().select_for_update().update(updated=True)
         return super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
+        self.updated = True
         super().save(*args, **kwargs)
-        with transaction.atomic():
-            obj = self.__class__.objects.select_for_update().get(pk=self.pk)
-            obj.updated = True
-            obj.save(update_fields=['updated'])
 
     def __str__(self) -> str:
         return str(self.name)
