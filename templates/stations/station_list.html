@@ -17,35 +17,39 @@
 
     h2 { margin: 0; color: #333; }
 
-    /* Buttons adapted to the site vibe */
+    /* Base Button Style */
     .btn {
         padding: 6px 12px;
         text-decoration: none;
-        border-radius: 4px; /* Matches container radius */
+        border-radius: 4px;
         font-size: 0.85rem;
         border: 1px solid transparent;
         cursor: pointer;
-        transition: opacity 0.2s;
-        font-family: Arial, sans-serif;
+        transition: opacity 0.2s, background-color 0.2s;
+        font-family: inherit;
+        display: inline-block;
     }
-    .btn:hover { opacity: 0.85; }
+    .btn:hover { opacity: 0.9; }
 
-    /* Primary Actions - Dark Grey (Matches Header) */
-    .btn-add { 
-        background-color: #333; 
-        color: white; 
+    /* Primary Actions (Add) - Dark Grey */
+    .btn-add { background-color: #333; color: white; }
+
+    /* Edit Action - Muted Blue border */
+    .btn-edit {
+        background-color: white;
+        color: #007bff;
+        border: 1px solid #007bff;
+        margin-right: 4px;
     }
+    .btn-edit:hover { background-color: #007bff; color: white; }
 
-    /* Destructive Actions - Muted Red */
+    /* Delete Action - Muted Red border */
     .btn-del { 
         background-color: white;
         color: #d9534f;
         border: 1px solid #d9534f;
     }
-    .btn-del:hover {
-        background-color: #d9534f;
-        color: white;
-    }
+    .btn-del:hover { background-color: #d9534f; color: white; }
 
     /* Toggles - Clean Blue/Grey */
     .btn-toggle { background-color: #007bff; color: white; }
@@ -100,8 +104,10 @@
     <thead>
         <tr>
             <th>Station Name</th>
-            <th>Lines</th> <th>Neighbouring Stations</th> {% if user.is_staff %}
-                <th style="width: 100px;">Actions</th>
+            <th>Lines</th>
+            <th>Neighbouring Stations</th>
+            {% if user.is_staff %}
+                <th style="width: 140px;">Actions</th>
             {% endif %}
         </tr>
     </thead>
@@ -125,8 +131,10 @@
                     <span style="color: #999;">None</span>
                 {% endfor %}
             </td>
+            
             {% if user.is_staff %}
             <td>
+                <a href="{% url 'stations:update' station.pk %}" class="btn btn-edit">Edit</a>
                 <a href="{% url 'stations:delete' station.pk %}" class="btn btn-del">Delete</a>
             </td>
             {% endif %}
@@ -152,9 +160,11 @@
     <thead>
         <tr>
             <th>Line Name</th>
-            <th>Line Color</th> <th>Status (Running)</th>
-            <th>Status (Ticket Purchase)</th> {% if user.is_staff %}
-                <th style="width: 100px;">Actions</th>
+            <th>Line Color</th>
+            <th>Status (Running)</th>
+            <th>Status (Ticket Purchase)</th>
+            {% if user.is_staff %}
+                <th style="width: 140px;">Actions</th>
             {% endif %}
         </tr>
     </thead>
@@ -203,6 +213,7 @@
 
             {% if user.is_staff %}
             <td>
+                <a href="{% url 'stations:line_update' line.pk %}" class="btn btn-edit">Edit</a>
                 <a href="{% url 'stations:line_delete' line.pk %}" class="btn btn-del">Delete</a>
             </td>
             {% endif %}
@@ -216,5 +227,4 @@
         {% endfor %}
     </tbody>
 </table>
-
 {% endblock %}

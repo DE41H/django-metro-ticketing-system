@@ -1,113 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}Add New Station{% endblock %}
+{% block title %}{% if object %}Edit Station{% else %}Add New Station{% endif %}{% endblock %}
 
 {% block content %}
 <style>
-    .form-box {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    /* Match the label style to the table headers in base.html */
+    .form-box { max-width: 600px; margin: 0 auto; }
+    
     label {
-        display: block;
-        margin-top: 20px;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #333;
+        display: block; margin-top: 20px; margin-bottom: 8px;
+        font-weight: bold; color: #333;
     }
-
-    /* Style text inputs to match table cells */
     input[type="text"] {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 1rem;
+        width: 100%; padding: 12px; border: 1px solid #ddd;
+        border-radius: 4px; box-sizing: border-box; font-size: 1rem;
     }
-
-    /* Custom style for the CheckboxSelectMultiple widget */
     .checkbox-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 10px;
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 4px;
-        background: #f9f9f9;
-        max-height: 200px;
-        overflow-y: auto; /* Scroll if too many items */
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px; border: 1px solid #ddd; padding: 15px;
+        border-radius: 4px; background: #f9f9f9;
+        max-height: 200px; overflow-y: auto;
     }
-
-    /* Style the individual checkbox items */
     .checkbox-grid label {
-        margin: 0;
-        font-weight: normal;
-        font-size: 0.9em;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
+        margin: 0; font-weight: normal; font-size: 0.9em;
+        display: flex; align-items: center; cursor: pointer;
     }
-
-    .checkbox-grid input[type="checkbox"] {
-        margin-right: 8px;
-        transform: scale(1.1);
-    }
-
-    /* Help text styling */
-    .helptext {
-        display: block;
-        margin-top: 5px;
-        font-size: 0.8em;
-        color: #666;
-    }
-
-    /* Buttons matching the site theme */
+    .checkbox-grid input[type="checkbox"] { margin-right: 8px; transform: scale(1.1); }
+    .helptext { display: block; margin-top: 5px; font-size: 0.8em; color: #666; }
+    
     .btn-submit {
-        background-color: #333; /* Matching Header */
-        color: white;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 4px;
-        font-size: 1rem;
-        cursor: pointer;
-        margin-top: 30px;
-        width: 100%;
+        background-color: #333; color: white; padding: 12px 24px;
+        border: none; border-radius: 4px; font-size: 1rem;
+        cursor: pointer; margin-top: 30px; width: 100%;
         transition: background-color 0.2s;
     }
-
-    .btn-submit:hover {
-        background-color: #555;
-    }
-
+    .btn-submit:hover { background-color: #555; }
+    
     .btn-cancel {
-        display: block;
-        text-align: center;
-        margin-top: 15px;
-        color: #666;
-        text-decoration: none;
+        display: block; text-align: center; margin-top: 15px;
+        color: #666; text-decoration: none;
     }
     .btn-cancel:hover { text-decoration: underline; }
 </style>
 
 <div class="form-box">
-    <h2>Add New Station</h2>
+    <h2>{% if object %}Edit Station{% else %}Add New Station{% endif %}</h2>
 
     <form method="post">
         {% csrf_token %}
-
         {% for field in form %}
             <div class="field-wrapper">
                 {{ field.label_tag }}
-                
                 {% if field.name == 'lines' or field.name == 'neighbours' %}
-                    <div class="checkbox-grid">
-                        {% for checkbox in field %}
-                            {{ checkbox }}
-                        {% endfor %}
-                    </div>
+                    <div class="checkbox-grid">{{ field }}</div>
                 {% else %}
                     {{ field }}
                 {% endif %}
@@ -115,15 +59,16 @@
                 {% if field.help_text %}
                     <span class="helptext">{{ field.help_text }}</span>
                 {% endif %}
-                
                 {% for error in field.errors %}
-                    <div style="color: #721c24; margin-top: 5px; font-size: 0.9em;">{{ error }}</div>
+                    <div style="color: #d9534f; margin-top: 5px; font-size: 0.9em;">{{ error }}</div>
                 {% endfor %}
             </div>
         {% endfor %}
 
-        <button type="submit" class="btn-submit">Save</button>
+        <button type="submit" class="btn-submit">
+            {% if object %}Update Station{% else %}Save Station{% endif %}
+        </button>
         <a href="{% url 'stations:list' %}" class="btn-cancel">Cancel</a>
     </form>
 </div>
-{% endblock %}  
+{% endblock %}

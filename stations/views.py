@@ -43,6 +43,16 @@ class StationCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateV
 
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
+    
+
+class StationUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Station
+    form_class = StationForm
+    template_name = 'stations/station_create.html'
+    success_url = reverse_lazy('stations:list')
+    
+    def test_func(self) -> bool | None:
+        return self.request.user.is_staff
 
 
 class StationDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
@@ -58,10 +68,17 @@ class LineCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView
     model = Line
     form_class = LineForm
     template_name = 'stations/line_create.html'
-    
-    def get_success_url(self) -> str:
-        return reverse_lazy('stations:list')
+    success_url = reverse_lazy('stations:list')
 
+    def test_func(self) -> bool | None:
+        return self.request.user.is_staff
+    
+class LineUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Line
+    form_class = LineForm
+    template_name = 'stations/line_create.html'
+    success_url = reverse_lazy('stations:list')
+    
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
 
@@ -69,9 +86,7 @@ class LineCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView
 class LineDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
     model = Line
     template_name = 'stations/line_delete.html'
-
-    def get_success_url(self) -> str:
-        return reverse_lazy('stations:list')
+    success_url = reverse_lazy('stations:list')
     
     def test_func(self) -> bool | None:
         return self.request.user.is_staff
