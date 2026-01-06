@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<style>
+    .delete-box {
+        max-width: 500px;
+        margin: 40px auto;
+        text-align: center;
+        border: 1px solid #f5c6cb;
+        background-color: #f8d7da;
+        padding: 20px;
+        border-radius: 8px;
+        color: #721c24;
+    }
+    .btn-confirm {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .btn-cancel {
+        display: inline-block;
+        margin-left: 10px;
+        color: #333;
+        text-decoration: none;
+    }
+</style>
+
+<div class="delete-box">
+    <h2>⚠ Delete Confirmation</h2>
+    <p>Are you sure you want to permanently delete:</p>
+    
+    <h3>"{{ object.name }}"</h3>
+    
+    <p>This action cannot be undone.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-confirm">Yes, Delete</button>
+        <a href="{% url 'stations:list' %}" class="btn-cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,12 +1,188 @@
 {% extends "base.html" %}
 
+{% block title %}Stations & Lines Management{% endblock %}
+
 {% block content %}
-  <h2>Stations</h2>
-  <ul>
-    {% for station in stations %}
-      <li>{{ station.name }}</li>
-    {% empty %}
-      <li>No stations available.</li>
-    {% endfor %}
-  </ul>
+<style>
+    /* specific styles for this page */
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 8px 12px;
+        text-decoration: none;
+        border-radius: 4px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+    .btn-add { background-color: #28a745; }
+    .btn-del { background-color: #dc3545; }
+    .btn-toggle { background-color: #007bff; }
+    .btn-toggle-off { background-color: #6c757d; }
+    
+    .color-box {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 5px;
+        border: 1px solid #ccc;
+    }
+    .tag {
+        display: inline-block;
+        background: #e2e6ea;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        margin: 2px;
+    }
+    /* Status badges for non-admins */
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        color: white;
+        display: inline-block;
+    }
+    .status-active { background-color: #28a745; }
+    .status-inactive { background-color: #6c757d; }
+
+    /* Form alignment for buttons */
+    form.inline-form { display: inline; }
+</style>
+
+<div class="header-actions">
+    <h2>Stations</h2>
+    {% if user.is_staff %}
+        <a href="{% url 'stations:create' %}" class="btn btn-add">+ Add New Station</a>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Station Name</th>
+            <th>Lines</th> <th>Neighbouring Stations</th> {% if user.is_staff %}
+                <th style="width: 100px;">Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for station in stations %}
+        <tr>
+            <td>{{ station.name }}</td>
+            <td>
+                {% for line in station.lines.all %}
+                    <span class="tag" style="border-left: 5px solid {{ line.color }};">
+                        {{ line.name }}
+                    </span>
+                {% empty %}
+                    <span style="color: #999;">No lines</span>
+                {% endfor %}
+            </td>
+            <td>
+                {% for neighbour in station.neighbours.all %}
+                    <span class="tag">{{ neighbour.name }}</span>
+                {% empty %}
+                    <span style="color: #999;">None</span>
+                {% endfor %}
+            </td>
+            {% if user.is_staff %}
+            <td>
+                <a href="{% url 'stations:delete' station.pk %}" class="btn btn-del">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="{% if user.is_staff %}4{% else %}3{% endif %}" style="text-align:center;">
+                No stations found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="header-actions">
+    <h2>Metro Lines</h2>
+    {% if user.is_staff %}
+        <a href="{% url 'stations:line_create' %}" class="btn btn-add">+ Add New Line</a>
+    {% endif %}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Line Name</th>
+            <th>Line Color</th> <th>Status (Running)</th>
+            <th>Status (Ticket Purchase)</th> {% if user.is_staff %}
+                <th style="width: 100px;">Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for line in all_lines %}
+        <tr>
+            <td>{{ line.name }}</td>
+            <td>
+                <span class="color-box" style="background-color: {{ line.color }};"></span>
+                {{ line.color }}
+            </td>
+            
+            <td>
+                {% if user.is_staff %}
+                    <form action="{% url 'stations:line_running' line.pk %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn {% if line.is_running %}btn-toggle{% else %}btn-toggle-off{% endif %}">
+                            {% if line.is_running %}Running{% else %}Stopped{% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    {% if line.is_running %}
+                        <span class="status-badge status-active">Running</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Stopped</span>
+                    {% endif %}
+                {% endif %}
+            </td>
+
+            <td>
+                {% if user.is_staff %}
+                    <form action="{% url 'stations:line_allow_ticket_purchase' line.pk %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn {% if line.allow_ticket_purchase %}btn-toggle{% else %}btn-toggle-off{% endif %}">
+                            {% if line.allow_ticket_purchase %}Allowed{% else %}Paused{% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    {% if line.allow_ticket_purchase %}
+                        <span class="status-badge status-active">Allowed</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Paused</span>
+                    {% endif %}
+                {% endif %}
+            </td>
+
+            {% if user.is_staff %}
+            <td>
+                <a href="{% url 'stations:line_delete' line.pk %}" class="btn btn-del">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="{% if user.is_staff %}5{% else %}4{% endif %}" style="text-align:center;">
+                No lines found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

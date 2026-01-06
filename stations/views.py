@@ -18,6 +18,11 @@ class StationListView(generic.ListView):
     context_object_name = 'stations'
     ordering = ['name']
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['all_lines'] = Line.objects.all()
+        return context
+
     def get_queryset(self) -> QuerySet[Any]:
         return Station.objects.prefetch_related('lines', 'neighbours')
 
@@ -32,7 +37,7 @@ class MapRedirectView(generic.RedirectView):
 class StationCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Station
     fields = ['name', 'lines', 'neighbours']
-    template_name_field = 'stations/station_create.html'
+    template_name = 'stations/station_create.html'
     success_url = reverse_lazy('stations:list')
 
     def test_func(self) -> bool | None:
@@ -51,7 +56,7 @@ class StationDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteV
 class LineCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Line
     fields = ['name', 'color']
-    template_name = 'stations/station_create.html'
+    template_name = 'stations/line_create.html'
     
     def get_success_url(self) -> str:
         return reverse_lazy('stations:create')
@@ -62,7 +67,7 @@ class LineCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView
 
 class LineDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
     model = Line
-    template_name = 'stations/station_delete.html'
+    template_name = 'stations/line_delete.html'
 
     def get_success_url(self) -> str:
         return reverse_lazy('stations:create')
