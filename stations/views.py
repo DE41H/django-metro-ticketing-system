@@ -81,7 +81,7 @@ class LineToggleRunningView(LoginRequiredMixin, UserPassesTestMixin, generic.Red
     permanent = False
 
     def get_redirect_url(self, *args: Any, **kwargs: Any) -> str | None:
-        return reverse_lazy('stations:create')
+        return reverse_lazy('stations:list')
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         pk = self.kwargs.get('pk')
@@ -97,7 +97,7 @@ class LineToggleTicketPurchaseView(LoginRequiredMixin, UserPassesTestMixin, gene
     permanent = False
 
     def get_redirect_url(self, *args: Any, **kwargs: Any) -> str | None:
-        return reverse_lazy('stations:create')
+        return reverse_lazy('stations:list')
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         pk = self.kwargs.get('pk')
