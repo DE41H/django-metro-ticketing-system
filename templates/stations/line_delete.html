@@ -4,73 +4,89 @@
 
 {% block content %}
 <style>
-    .delete-container {
-        max-width: 500px;
-        margin: 50px auto;
-        text-align: center;
-        background-color: #fff;
-        border: 1px solid #f8d7da;
-        border-top: 5px solid #dc3545;
-        border-radius: 8px;
-        padding: 30px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    .form-box {
+        max-width: 600px;
+        margin: 0 auto;
+        padding-top: 20px;
     }
-    .warning-icon {
-        font-size: 40px;
-        color: #dc3545;
-        margin-bottom: 10px;
+
+    .confirmation-text {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.5;
     }
-    .line-name {
-        font-size: 1.2em;
+
+    .item-preview {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 30px;
         font-weight: bold;
-        background-color: #f1f1f1;
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-        display: inline-block;
+        display: flex;
+        align-items: center;
     }
-    .btn-confirm {
-        background-color: #dc3545;
+
+    .color-dot {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        margin-right: 15px;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .warning-note {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 30px;
+        font-style: italic;
+    }
+
+    /* Destructive Action Button */
+    .btn-delete {
+        background-color: #d9534f; /* Muted Red */
         color: white;
-        padding: 10px 25px;
+        padding: 12px 24px;
         border: none;
         border-radius: 4px;
+        font-size: 1rem;
         cursor: pointer;
-        font-size: 16px;
-        margin-right: 10px;
+        width: 100%;
+        transition: background-color 0.2s;
     }
-    .btn-confirm:hover { background-color: #c82333; }
+
+    .btn-delete:hover {
+        background-color: #c9302c;
+    }
+
     .btn-cancel {
-        background-color: #6c757d;
-        color: white;
-        padding: 10px 25px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #666;
         text-decoration: none;
-        font-size: 16px;
     }
-    .btn-cancel:hover { background-color: #5a6268; }
+    .btn-cancel:hover { text-decoration: underline; }
 </style>
 
-<div class="delete-container">
-    <div class="warning-icon">⚠️</div>
-    <h2>Delete Line?</h2>
-    
-    <p>Are you sure you want to permanently delete this line?</p>
-    
-    <div class="line-name">
-        <span style="color: {{ object.color }};">●</span> {{ object.name }}
+<div class="form-box">
+    <h2>Delete Line</h2>
+
+    <p class="confirmation-text">Are you sure you want to delete this line?</p>
+
+    <div class="item-preview">
+        <span class="color-dot" style="background-color: {{ object.color }};"></span>
+        {{ object.name }}
     </div>
 
-    <p style="font-size: 0.9em; color: #666; margin-bottom: 25px;">
-        This will remove the line from all associated stations. <br>
-        This action cannot be undone.
+    <p class="warning-note">
+        This action cannot be undone. The line will be removed from all associated stations.
     </p>
 
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn-confirm">Yes, Delete It</button>
+        <button type="submit" class="btn-delete">Confirm Delete</button>
         <a href="{% url 'stations:list' %}" class="btn-cancel">Cancel</a>
     </form>
 </div>

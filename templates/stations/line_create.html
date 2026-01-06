@@ -1,86 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}Create New Line{% endblock %}
+{% block title %}Add New Line{% endblock %}
 
 {% block content %}
 <style>
-    .form-container {
-        max-width: 500px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
+    .form-box {
+        max-width: 600px;
+        margin: 0 auto;
     }
+
+    /* Consistent Label Styling */
+    label {
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Input Styling */
     input[type="text"], input[type="color"] {
         width: 100%;
-        padding: 10px;
-        margin: 5px 0 15px 0;
-        display: inline-block;
-        border: 1px solid #ccc;
+        padding: 12px;
+        border: 1px solid #ddd;
         border-radius: 4px;
         box-sizing: border-box;
+        font-size: 1rem;
+        min-height: 45px; /* Ensures color picker isn't too thin */
     }
-    .btn-save {
-        width: 100%;
-        background-color: #28a745;
+
+    /* Helper Text */
+    .helptext {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.85em;
+        color: #666;
+    }
+
+    /* Error Text */
+    .error-msg {
+        color: #d9534f;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    /* "Save" Button - Matches Header/Theme */
+    .btn-submit {
+        background-color: #333;
         color: white;
-        padding: 12px 20px;
+        padding: 12px 24px;
         border: none;
         border-radius: 4px;
+        font-size: 1rem;
         cursor: pointer;
-        font-size: 16px;
+        margin-top: 30px;
+        width: 100%;
+        transition: background-color 0.2s;
     }
-    .btn-save:hover { background-color: #218838; }
-    .cancel-link {
+
+    .btn-submit:hover {
+        background-color: #555;
+    }
+
+    /* Cancel Link */
+    .btn-cancel {
         display: block;
         text-align: center;
         margin-top: 15px;
         color: #666;
         text-decoration: none;
     }
+    .btn-cancel:hover { text-decoration: underline; }
 </style>
 
-<div class="form-container">
-    <h2 style="text-align: center;">Create Metro Line</h2>
+<div class="form-box">
+    <h2>Add New Line</h2>
     
     <form method="post">
         {% csrf_token %}
         
         {% for field in form %}
-            <label for="{{ field.id_for_label }}">
-                <strong>{{ field.label }}</strong>
-            </label>
-            
-            {{ field }}
-            
-            {% if field.help_text %}
-                <small style="color: grey">{{ field.help_text }}</small>
-            {% endif %}
-            
-            {% for error in field.errors %}
-                <div style="color: red; font-size: 0.9em; margin-bottom: 10px;">
-                    {{ error }}
-                </div>
-            {% endfor %}
-            <br>
+            <div class="field-wrapper">
+                {{ field.label_tag }}
+                
+                {{ field }}
+                
+                {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+                
+                {% for error in field.errors %}
+                    <div class="error-msg">{{ error }}</div>
+                {% endfor %}
+            </div>
         {% endfor %}
 
-        <button type="submit" class="btn-save">Save Line</button>
+        <button type="submit" class="btn-submit">Save</button>
+        <a href="{% url 'stations:list' %}" class="btn-cancel">Cancel</a>
     </form>
-    
-    <a href="{% url 'stations:list' %}" class="cancel-link">Cancel</a>
 </div>
-
-<script>
-    // Optional: Attempt to turn the 'color' text input into a color picker
-    document.addEventListener("DOMContentLoaded", function() {
-        const colorInput = document.querySelector('input[name="color"]');
-        if (colorInput) {
-            colorInput.type = 'color';
-            // Set a default if empty to avoid black box issues
-            if (!colorInput.value) colorInput.value = '#0000ff';
-        }
-    });
-</script>
 {% endblock %}
