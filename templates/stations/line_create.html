@@ -16,7 +16,14 @@
         font-size: 1rem; min-height: 45px;
     }
     .helptext { display: block; margin-top: 5px; font-size: 0.85em; color: #666; }
-    .error-msg { color: #d9534f; font-size: 0.9em; margin-top: 5px; }
+    
+    /* Error Blocks */
+    .error-block {
+        background-color: #f8d7da; color: #721c24; 
+        padding: 15px; border-radius: 4px; margin-bottom: 20px; 
+        border: 1px solid #f5c6cb;
+    }
+    .field-error { color: #d9534f; margin-top: 5px; font-size: 0.9em; }
 
     .btn-submit {
         background-color: #333; color: white; padding: 12px 24px;
@@ -38,15 +45,26 @@
     
     <form method="post">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="error-block">
+                {% for error in form.non_field_errors %}
+                    <p style="margin: 0;"><strong>Error:</strong> {{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% for field in form %}
             <div class="field-wrapper">
                 {{ field.label_tag }}
                 {{ field }}
+                
                 {% if field.help_text %}
                     <span class="helptext">{{ field.help_text }}</span>
                 {% endif %}
+                
                 {% for error in field.errors %}
-                    <div class="error-msg">{{ error }}</div>
+                    <div class="field-error">{{ error }}</div>
                 {% endfor %}
             </div>
         {% endfor %}

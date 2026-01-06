@@ -46,6 +46,10 @@ class Line(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         self.updated = True
+        if 'update_fields' in kwargs and kwargs['update_fields'] is not None:
+            fields = set(kwargs['update_fields'])
+            fields.add('updated')
+            kwargs['update_fields'] = list(fields)
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -83,6 +87,10 @@ class Station(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         self.updated = True
+        if 'update_fields' in kwargs and kwargs['update_fields'] is not None:
+            fields = set(kwargs['update_fields'])
+            fields.add('updated')
+            kwargs['update_fields'] = list(fields)
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
