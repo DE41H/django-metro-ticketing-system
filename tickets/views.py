@@ -27,8 +27,11 @@ class TicketPurchaseView(LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         start = form.instance.start
         stop = form.instance.stop
-        if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
-            messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
+        if not start.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, f'Ticket Purchase is Disabled for {start.name}!')
+            return self.form_invalid(form)
+        elif not stop.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, f'Ticket Purchase is Disabled for {stop.name}!')
             return self.form_invalid(form)
         elif start == stop:
             messages.error(self.request, 'Start and Destination cannot be the same!')
@@ -182,8 +185,11 @@ class TicketPurchaseOfflineView(LoginRequiredMixin, UserPassesTestMixin, generic
         if start is None or stop is None or price is None:
             messages.error(self.request, 'Invalid confirmation request!')
             return self.form_invalid(form)
-        if not start.lines.filter(allow_ticket_purchase=True).exists() or not stop.lines.filter(allow_ticket_purchase=True).exists():
-            messages.error(self.request, 'Ticket Purchase is Disabled for a Chosen Station!')
+        if not start.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, f'Ticket Purchase is Disabled for {start.name}!')
+            return self.form_invalid(form)
+        elif not stop.lines.filter(allow_ticket_purchase=True).exists():
+            messages.error(self.request, f'Ticket Purchase is Disabled for {stop.name}!')
             return self.form_invalid(form)
         elif start == stop:
             messages.error(self.request, 'Start and Destination cannot be the same!')

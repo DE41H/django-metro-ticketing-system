@@ -18,7 +18,7 @@ def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
         pk_path = nx.shortest_path(graph, start.pk, stop.pk)
         stations = Station.objects.in_bulk(pk_path)
         return tuple([stations[pk] for pk in pk_path if pk in stations])
-    except nx.NetworkXNoPath:
+    except (nx.NetworkXNoPath, nx.NodeNotFound):
         return ()
 
 def get_map_url() -> str:
