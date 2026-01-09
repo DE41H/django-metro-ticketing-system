@@ -2,6 +2,7 @@ import os
 import time
 import portalocker
 import networkx as nx
+from collections import deque
 from pyvis.network import Network
 from django.conf import settings
 from .models import Station, Line
@@ -13,13 +14,33 @@ os.makedirs(MAPS_DIR, exist_ok=True)
 HTML_PATH = os.path.join(MAPS_DIR, f'graph.html')
 
 def calculate_route(start: Station, stop: Station) -> tuple[Station, ...]:
-    try:
-        graph = _get_graph()
-        pk_path = nx.shortest_path(graph, start.pk, stop.pk)
-        stations = Station.objects.in_bulk(pk_path)
-        return tuple([stations[pk] for pk in pk_path if pk in stations])
-    except (nx.NetworkXNoPath, nx.NodeNotFound):
-        return ()
+    graph = _get_graph()
+    pk_path = _bfs(graph, start.pk, stop.pk)
+    stations = Station.objects.in_bulk(pk_path)
+    return tuple([stations[pk] for pk in pk_path if pk in stations])
+    
+def _bfs(graph: nx.DiGraph, start: str, stop: str) -> list[str]:
+    if start not in graph or stop not in graph:
+        return []
+    queue = deque([start])
+    visited = {start: None}
+    while queue:
+        current = queue.popleft()
+        if current == stop:
+            return _get_path(visited, stop)
+        for neighbour in graph[current]:
+            if neighbour not in visited:
+                visited[neighbour] = current # type: ignore
+                queue.append(neighbour)
+    return []
+
+def _get_path(visited, stop: str):
+    path = []
+    current = stop
+    while current is not None:
+        path.append(current)
+        current = visited[current]
+    return list(reversed(path))
 
 def get_map_url() -> str:
     if not os.path.exists(HTML_PATH) or _is_updated():
