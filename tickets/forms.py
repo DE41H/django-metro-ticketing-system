@@ -15,7 +15,7 @@ class WalletBalanceUpdateForm(forms.ModelForm):
         label='Amount to Add',
         max_digits=11,
         decimal_places=2,
-        min_value=Decimal(0.5),
+        min_value=Decimal(0.01),
         widget = forms.NumberInput(attrs={'step': '0.5'}),
         required=True
     )
