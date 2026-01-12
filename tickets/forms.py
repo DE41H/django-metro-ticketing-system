@@ -13,7 +13,7 @@ _otp_validator = RegexValidator(
 class WalletBalanceUpdateForm(forms.ModelForm):
     amount = forms.DecimalField(
         label='Amount to Add',
-        max_digits=11,
+        max_digits=19,
         decimal_places=2,
         min_value=Decimal(0.01),
         widget = forms.NumberInput(attrs={'step': '0.5'}),

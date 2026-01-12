@@ -67,7 +67,7 @@ class Ticket(models.Model):
 
 class Wallet(models.Model):
     user = models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet', primary_key=True)
-    balance = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal(0))
+    balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
 
 
     class Meta:
