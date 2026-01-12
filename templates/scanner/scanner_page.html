@@ -4,120 +4,250 @@
 
 {% block extra_css %}
 <style>
+    .scanner-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
     .scanner-header {
         text-align: center;
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-default);
+        position: relative;
+    }
+    
+    .scanner-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent) 0%, var(--accent-soft) 100%);
+    }
+    
+    .staff-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: var(--radius-sm);
+        color: var(--accent);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 1rem;
+    }
+    
+    .staff-badge::before {
+        content: '👤';
+        font-size: 1rem;
     }
     
     .scanner-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
         color: var(--text-primary);
-        font-size: 2.25rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.025em;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.03em;
     }
     
     .scanner-header p {
         color: var(--text-secondary);
-        font-size: 1rem;
-        font-weight: 500;
+        font-size: 1.125rem;
+        font-weight: 400;
     }
     
     .section-title {
         color: var(--text-primary);
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        margin: 2rem 0 1.25rem;
-        letter-spacing: -0.025em;
+        margin: 2.5rem 0 1.5rem;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 2px;
     }
     
     .action-list {
         list-style: none;
         display: grid;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
     }
     
     .action-list li a {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        background: var(--darker-bg);
-        padding: 1.25rem 1.5rem;
-        border-radius: 10px;
+        gap: 1.25rem;
+        background: rgba(10, 14, 26, 0.5);
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
         text-decoration: none;
         color: var(--text-primary);
         font-weight: 600;
-        font-size: 1rem;
-        border: 1px solid var(--glass-border);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1.0625rem;
+        border: 1px solid var(--border-default);
+        transition: all var(--transition-base);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-list li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        opacity: 0;
+        transition: opacity var(--transition-base);
     }
     
     .action-list li a:hover {
-        background: var(--slate-light);
-        border-color: var(--primary);
-        transform: translateX(4px);
+        background: rgba(30, 38, 64, 0.6);
+        border-color: var(--border-strong);
+        transform: translateX(6px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .action-list li a:hover::before {
+        opacity: 1;
     }
     
     .action-icon {
-        width: 44px;
-        height: 44px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 10px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.375rem;
+        font-size: 1.75rem;
         flex-shrink: 0;
+        box-shadow: var(--glow-primary);
+        transition: transform var(--transition-base);
+    }
+    
+    .action-list li a:hover .action-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .action-content {
+        flex: 1;
+    }
+    
+    .action-title {
+        display: block;
+        font-size: 1.0625rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .action-desc {
+        display: block;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+    }
+    
+    .admin-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-default);
     }
     
     .admin-link {
-        display: inline-block;
-        margin-top: 1.5rem;
-        padding: 0.875rem 1.75rem;
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.3);
-        border-radius: 10px;
-        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        background: rgba(255, 182, 39, 0.08);
+        border: 1px solid rgba(255, 182, 39, 0.3);
+        border-radius: var(--radius-md);
+        color: var(--warning);
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.9375rem;
-        transition: all 0.2s ease;
+        font-size: 1rem;
+        transition: all var(--transition-base);
     }
     
     .admin-link:hover {
-        background: rgba(245, 158, 11, 0.15);
-        border-color: var(--accent);
-        transform: translateY(-1px);
+        background: rgba(255, 182, 39, 0.15);
+        border-color: var(--warning);
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(255, 182, 39, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .scanner-header h1 {
+            font-size: 2rem;
+        }
+        
+        .action-list li a {
+            padding: 1.25rem 1.25rem;
+            gap: 1rem;
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="glass-card">
+<div class="glass-card scanner-container">
     <div class="scanner-header">
-        <h1>Staff Scanner Portal</h1>
-        <p>Welcome, {{ user.username }}. Use the options below to manage tickets.</p>
+        <div class="staff-badge">Staff Portal</div>
+        <h1>Ticket Scanner</h1>
+        <p>Welcome, <strong>{{ user.username }}</strong></p>
     </div>
     
-    <h2 class="section-title">Ticket Management</h2>
+    <h2 class="section-title">Ticket Operations</h2>
     <ul class="action-list">
         <li>
             <a href="{% url 'tickets:ticket_scan' %}">
                 <span class="action-icon">📱</span>
-                <span>Scan / Validate Ticket</span>
+                <span class="action-content">
+                    <span class="action-title">Scan & Validate Ticket</span>
+                    <span class="action-desc">Verify and process passenger tickets</span>
+                </span>
             </a>
         </li>
         <li>
             <a href="{% url 'tickets:ticket_purchase_offline' %}">
                 <span class="action-icon">🎫</span>
-                <span>Offline Ticket Purchase</span>
+                <span class="action-content">
+                    <span class="action-title">Offline Ticket Purchase</span>
+                    <span class="action-desc">Issue tickets for walk-in customers</span>
+                </span>
             </a>
         </li>
     </ul>
     
-    <a href="/admin/" class="admin-link">Go to Django Admin</a>
+    <div class="admin-section">
+        <a href="/admin/" class="admin-link">
+            <span>⚙️</span>
+            <span>Django Admin Panel</span>
+        </a>
+    </div>
 </div>
 {% endblock %}

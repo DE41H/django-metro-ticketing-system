@@ -6,35 +6,121 @@
 <style>
     .map-container {
         text-align: center;
-        padding: 5rem 2rem;
+        padding: 6rem 2rem;
+        position: relative;
     }
     
     .map-icon {
-        width: 96px;
-        height: 96px;
-        margin: 0 auto 2rem;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 16px;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 2.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: var(--radius-xl);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 3rem;
-        color: white;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        font-size: 4rem;
+        box-shadow: var(--glow-primary);
+        animation: float 3s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .map-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+        animation: rotate 15s linear infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(3deg); }
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
     
     h2 {
+        font-family: 'Space Grotesk', sans-serif;
         color: var(--text-primary);
-        font-size: 2.25rem;
-        font-weight: 800;
-        margin-bottom: 0.75rem;
-        letter-spacing: -0.025em;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        letter-spacing: -0.03em;
     }
     
     .coming-soon {
         color: var(--text-secondary);
         font-size: 1.125rem;
-        font-weight: 500;
+        font-weight: 400;
+        margin-bottom: 2.5rem;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        max-width: 800px;
+        margin: 3rem auto 0;
+    }
+    
+    .feature-item {
+        padding: 1.5rem;
+        background: rgba(30, 38, 64, 0.4);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md);
+        transition: all var(--transition-base);
+    }
+    
+    .feature-item:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .feature-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-desc {
+        color: var(--text-tertiary);
+        font-size: 0.8125rem;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+        .map-container {
+            padding: 4rem 1.5rem;
+        }
+        
+        .map-icon {
+            width: 96px;
+            height: 96px;
+            font-size: 3rem;
+        }
+        
+        h2 {
+            font-size: 2rem;
+        }
+        
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
@@ -43,8 +129,26 @@
 <div class="glass-card">
     <div class="map-container">
         <div class="map-icon">🗺️</div>
-        <h2>Metro Map</h2>
-        <p class="coming-soon">Map content coming soon.</p>
+        <h2>Interactive Metro Map</h2>
+        <p class="coming-soon">Real-time network visualization coming soon</p>
+        
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🚇</div>
+                <div class="feature-title">Live Train Status</div>
+                <div class="feature-desc">Track trains in real-time</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Route Planning</div>
+                <div class="feature-desc">Find optimal paths</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📍</div>
+                <div class="feature-title">Station Details</div>
+                <div class="feature-desc">Explore nearby amenities</div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

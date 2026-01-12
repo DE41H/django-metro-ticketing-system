@@ -5,118 +5,209 @@
 {% block extra_css %}
 <style>
     .topup-wrapper {
-        max-width: 600px;
+        max-width: 640px;
         margin: 0 auto;
     }
     
     .page-header {
         text-align: center;
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-default);
+        position: relative;
+    }
+    
+    .page-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--success) 0%, var(--success-dark) 100%);
+    }
+    
+    .page-header-icon {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        box-shadow: var(--glow-success);
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
     }
     
     .page-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
         color: var(--text-primary);
         font-size: 2.25rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
+        font-weight: 700;
+        letter-spacing: -0.03em;
     }
     
     .current-balance-card {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 12px;
-        padding: 2rem;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--glow-primary);
         text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .current-balance-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .balance-content {
+        position: relative;
+        z-index: 1;
     }
     
     .current-balance-card p {
         color: rgba(255, 255, 255, 0.9);
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
+        font-size: 0.8125rem;
+        margin-bottom: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
     }
     
     .balance-amount {
         color: white;
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 800;
         margin: 0;
-        letter-spacing: -0.025em;
+        letter-spacing: -0.03em;
+        font-family: 'Space Grotesk', sans-serif;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     }
     
     form p {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
     
     label {
         display: block;
         color: var(--text-primary);
         font-weight: 600;
-        margin-bottom: 0.625rem;
-        font-size: 0.875rem;
-        letter-spacing: 0.025em;
+        margin-bottom: 0.75rem;
+        font-size: 0.8125rem;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
     
     input[type="number"],
     input[type="text"] {
         width: 100%;
-        padding: 1rem 1.25rem;
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
-        background: var(--darker-bg);
+        padding: 1.125rem 1.5rem;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md);
+        background: rgba(10, 14, 26, 0.5);
         color: var(--text-primary);
-        font-size: 1.25rem;
-        font-family: inherit;
-        transition: all 0.2s ease;
+        font-size: 1.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+        transition: all var(--transition-base);
         font-weight: 700;
     }
     
     input:focus {
         outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        border-color: var(--success);
+        background: rgba(10, 14, 26, 0.7);
+        box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1), var(--glow-success);
     }
     
     button[type="submit"] {
-        background: linear-gradient(135deg, var(--success), #059669);
+        background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
         color: white;
-        padding: 1rem 2.5rem;
+        padding: 1.125rem 2.5rem;
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
         width: 100%;
-        margin-top: 1.5rem;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        margin-top: 2rem;
+        transition: all var(--transition-base);
+        box-shadow: var(--glow-success);
         letter-spacing: 0.025em;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    button[type="submit"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    button[type="submit"]:hover::before {
+        left: 100%;
     }
     
     button[type="submit"]:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 30px rgba(0, 208, 132, 0.4), var(--shadow-lg);
     }
     
     .back-link {
-        display: block;
-        text-align: center;
-        margin-top: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding: 1rem;
         color: var(--text-secondary);
         text-decoration: none;
         font-weight: 500;
-        font-size: 0.875rem;
+        font-size: 0.9375rem;
+        border-radius: var(--radius-md);
+        transition: all var(--transition-base);
     }
     
     .back-link:hover {
         color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    @media (max-width: 768px) {
+        .balance-amount {
+            font-size: 2.75rem;
+        }
+        
+        input[type="number"] {
+            font-size: 1.25rem;
+        }
     }
 </style>
 {% endblock %}
@@ -124,22 +215,28 @@
 {% block content %}
 <div class="glass-card topup-wrapper">
     <div class="page-header">
-        <h1>Top Up Wallet Balance</h1>
+        <div class="page-header-icon">💳</div>
+        <h1>Add Funds</h1>
     </div>
     
     {% if user.is_authenticated and user.wallet %}
         <div class="current-balance-card">
-            <p>Current Balance</p>
-            <div class="balance-amount">${{ user.wallet.balance|default:"0.00" }}</div>
+            <div class="balance-content">
+                <p>Current Balance</p>
+                <div class="balance-amount">${{ user.wallet.balance|default:"0.00" }}</div>
+            </div>
         </div>
     {% endif %}
     
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">💳 Add Funds</button>
+        <button type="submit">Add Funds to Wallet</button>
     </form>
     
-    <a href="{% url 'tickets:dashboard' %}" class="back-link">← Go to Dashboard</a>
+    <a href="{% url 'tickets:dashboard' %}" class="back-link">
+        <span>←</span>
+        <span>Back to Dashboard</span>
+    </a>
 </div>
 {% endblock %}

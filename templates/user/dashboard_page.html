@@ -4,57 +4,108 @@
 
 {% block extra_css %}
 <style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
     .welcome-section {
         text-align: center;
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-default);
+        position: relative;
+    }
+    
+    .welcome-section::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
     }
     
     .welcome-section h1 {
+        font-family: 'Space Grotesk', sans-serif;
         color: var(--text-primary);
-        font-size: 2.5rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
+        font-size: 3rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-section p {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
     }
     
     .wallet-summary {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 12px;
-        padding: 2.5rem;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: var(--radius-xl);
+        padding: 3rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--glow-primary);
         text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .wallet-summary::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .wallet-content {
+        position: relative;
+        z-index: 1;
     }
     
     .wallet-summary h2 {
-        color: white;
-        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
     }
     
     .wallet-balance {
         color: white;
-        font-size: 3.5rem;
+        font-size: 4rem;
         font-weight: 800;
-        margin-bottom: 1.5rem;
-        letter-spacing: -0.025em;
+        margin-bottom: 2rem;
+        letter-spacing: -0.03em;
+        font-family: 'Space Grotesk', sans-serif;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     }
     
     .wallet-summary a {
-        display: inline-block;
-        padding: 0.75rem 1.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 2rem;
         background: rgba(255, 255, 255, 0.15);
         color: white;
         text-decoration: none;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         font-weight: 700;
-        font-size: 0.9375rem;
-        transition: all 0.2s ease;
+        font-size: 1rem;
+        transition: all var(--transition-base);
         border: 1px solid rgba(255, 255, 255, 0.2);
         letter-spacing: 0.025em;
     }
@@ -62,27 +113,56 @@
     .wallet-summary a:hover {
         background: rgba(255, 255, 255, 0.25);
         transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
     
     .no-wallet {
         color: rgba(255, 255, 255, 0.9);
-        font-size: 1rem;
-        padding: 1.5rem;
+        font-size: 1.125rem;
+        padding: 2rem;
         font-weight: 500;
     }
     
-    .section-card {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
         margin-bottom: 2rem;
+    }
+    
+    .section-card {
+        background: rgba(30, 38, 64, 0.4);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        transition: all var(--transition-base);
+    }
+    
+    .section-card:hover {
+        border-color: var(--border-strong);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
     }
     
     .section-card h2 {
         color: var(--text-primary);
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--glass-border);
-        letter-spacing: -0.025em;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-default);
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-card h2::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 2px;
     }
     
     .action-list {
@@ -96,106 +176,170 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        background: var(--darker-bg);
-        padding: 1.125rem 1.375rem;
-        border-radius: 10px;
+        background: rgba(10, 14, 26, 0.5);
+        padding: 1.125rem 1.25rem;
+        border-radius: var(--radius-md);
         text-decoration: none;
         color: var(--text-primary);
         font-weight: 600;
-        font-size: 1rem;
-        border: 1px solid var(--glass-border);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.9375rem;
+        border: 1px solid var(--border-default);
+        transition: all var(--transition-base);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-list li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        opacity: 0;
+        transition: opacity var(--transition-base);
     }
     
     .action-list li a:hover {
-        background: var(--slate-light);
-        border-color: var(--primary);
+        background: rgba(30, 38, 64, 0.6);
+        border-color: var(--border-strong);
         transform: translateX(4px);
     }
     
+    .action-list li a:hover::before {
+        opacity: 1;
+    }
+    
     .action-icon {
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 10px;
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.25rem;
         flex-shrink: 0;
+        box-shadow: var(--glow-primary);
+        transition: transform var(--transition-base);
+    }
+    
+    .action-list li a:hover .action-icon {
+        transform: scale(1.1);
     }
     
     .staff-section .action-icon {
-        background: linear-gradient(135deg, var(--accent), #F97316);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+        box-shadow: var(--glow-accent);
     }
     
-    hr {
-        border: none;
+    .divider {
         height: 1px;
-        background: var(--glass-border);
-        margin: 2.5rem 0;
+        background: var(--border-default);
+        margin: 3rem 0;
+        position: relative;
+    }
+    
+    .divider::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
+    }
+    
+    @media (max-width: 968px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+        
+        .wallet-balance {
+            font-size: 3rem;
+        }
+        
+        .wallet-summary {
+            padding: 2rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="glass-card">
+<div class="glass-card dashboard-container">
     <div class="welcome-section">
-        <h1>Welcome, {{ user.username }}!</h1>
+        <h1>Welcome back, {{ user.username }}!</h1>
+        <p>Manage your tickets and explore the metro network</p>
     </div>
     
     {% if user.wallet %}
         <div class="wallet-summary">
-            <h2>Wallet Summary</h2>
-            <div class="wallet-balance">${{ user.wallet.balance|default:"0.00" }}</div>
-            <a href="{% url 'tickets:wallet_balance_update' %}">💳 Add Funds</a>
+            <div class="wallet-content">
+                <h2>Wallet Balance</h2>
+                <div class="wallet-balance">${{ user.wallet.balance|default:"0.00" }}</div>
+                <a href="{% url 'tickets:wallet_balance_update' %}">
+                    <span>💳</span>
+                    <span>Add Funds</span>
+                </a>
+            </div>
         </div>
     {% else %}
         <div class="wallet-summary">
-            <p class="no-wallet">Wallet not initialized. Contact support.</p>
+            <div class="wallet-content">
+                <p class="no-wallet">Wallet not initialized. Please contact support.</p>
+            </div>
         </div>
     {% endif %}
     
-    <div class="section-card">
-        <h2>Ticket Actions</h2>
-        <ul class="action-list">
-            <li>
-                <a href="{% url 'tickets:ticket_purchase' %}">
-                    <span class="action-icon">🎫</span>
-                    <span>Buy New Ticket</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'tickets:ticket_list' %}">
-                    <span class="action-icon">📋</span>
-                    <span>View My Tickets</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    
-    <hr>
-    
-    <div class="section-card">
-        <h2>Network Information</h2>
-        <ul class="action-list">
-            <li>
-                <a href="{% url 'stations:list' %}">
-                    <span class="action-icon">🚉</span>
-                    <span>Stations List</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'stations:map' %}">
-                    <span class="action-icon">🗺️</span>
-                    <span>Metro Map</span>
-                </a>
-            </li>
-        </ul>
+    <div class="dashboard-grid">
+        <div class="section-card">
+            <h2>Ticket Services</h2>
+            <ul class="action-list">
+                <li>
+                    <a href="{% url 'tickets:ticket_purchase' %}">
+                        <span class="action-icon">🎫</span>
+                        <span>Purchase New Ticket</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tickets:ticket_list' %}">
+                        <span class="action-icon">📋</span>
+                        <span>View My Tickets</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="section-card">
+            <h2>Network Info</h2>
+            <ul class="action-list">
+                <li>
+                    <a href="{% url 'stations:list' %}">
+                        <span class="action-icon">🚉</span>
+                        <span>All Stations</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'stations:map' %}">
+                        <span class="action-icon">🗺️</span>
+                        <span>Network Map</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
     
     {% if user.is_staff %}
-    <hr>
+    <div class="divider"></div>
     
     <div class="section-card staff-section">
         <h2>Staff Tools</h2>
@@ -203,7 +347,7 @@
             <li>
                 <a href="{% url 'tickets:scanner' %}">
                     <span class="action-icon">📱</span>
-                    <span>Ticket Scanner Interface</span>
+                    <span>Ticket Scanner Portal</span>
                 </a>
             </li>
         </ul>

@@ -4,28 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Metro System{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563EB;
-            --primary-dark: #1E40AF;
-            --secondary: #0EA5E9;
-            --accent: #F59E0B;
-            --success: #10B981;
-            --danger: #EF4444;
-            --dark-bg: #0A1929;
-            --darker-bg: #020617;
-            --slate: #1E293B;
-            --slate-light: #334155;
-            --border: rgba(148, 163, 184, 0.1);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(148, 163, 184, 0.12);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 20px 40px 0 rgba(0, 0, 0, 0.5);
-            --text-primary: #F8FAFC;
-            --text-secondary: #CBD5E1;
-            --text-muted: #94A3B8;
+            --primary: #0066FF;
+            --primary-light: #3385FF;
+            --primary-dark: #0052CC;
+            --secondary: #00C2FF;
+            --accent: #FF6B35;
+            --accent-soft: #FFB627;
+            --success: #00D084;
+            --success-dark: #00A86B;
+            --danger: #FF3B30;
+            --warning: #FFB627;
+            
+            --bg-primary: #0A0E1A;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1A1F35;
+            --bg-elevated: #1E2640;
+            --bg-surface: #232B45;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-default: rgba(255, 255, 255, 0.1);
+            --border-strong: rgba(255, 255, 255, 0.2);
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            --text-muted: #4A5568;
+            
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 16px 48px -12px rgba(0, 0, 0, 0.6);
+            --shadow-xl: 0 24px 64px -16px rgba(0, 0, 0, 0.7);
+            
+            --glow-primary: 0 0 20px rgba(0, 102, 255, 0.3);
+            --glow-success: 0 0 20px rgba(0, 208, 132, 0.3);
+            --glow-accent: 0 0 20px rgba(255, 107, 53, 0.3);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * { 
@@ -35,127 +60,254 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--dark-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            background: radial-gradient(ellipse at top, rgba(0, 102, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
         
         header {
-            background: var(--slate);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1.25rem 2rem;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-default);
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
             box-shadow: var(--shadow-md);
         }
         
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
         header h1 {
-            font-size: 1.75rem;
-            font-weight: 800;
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--text-primary);
             text-align: center;
             margin-bottom: 1rem;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         nav {
             display: flex;
             justify-content: center;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 0.25rem;
             flex-wrap: wrap;
         }
         
         nav a {
             color: var(--text-secondary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 0.875rem;
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-base);
             border: 1px solid transparent;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.01em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            z-index: -1;
         }
         
         nav a:hover {
-            background: var(--slate-light);
             color: var(--text-primary);
-            border-color: var(--glass-border);
+            border-color: var(--border-strong);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+        }
+        
+        nav a:hover::before {
+            opacity: 0.1;
         }
         
         .container {
             max-width: 1400px;
-            margin: 2rem auto;
+            margin: 2.5rem auto;
             padding: 0 2rem;
+            position: relative;
+            z-index: 1;
         }
         
         .glass-card {
-            background: var(--slate);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 2.5rem;
+            background: rgba(30, 38, 64, 0.6);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: 3rem;
             box-shadow: var(--shadow-lg);
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-slow);
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                transparent 100%);
+        }
+        
+        .glass-card:hover {
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-xl);
         }
         
         .message {
-            padding: 1rem 1.25rem;
-            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
             margin-bottom: 1.5rem;
             border: 1px solid;
             font-weight: 500;
             font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message::before {
+            content: '';
+            width: 4px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
         }
         
         .success {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--success);
+            background: rgba(0, 208, 132, 0.08);
+            border-color: rgba(0, 208, 132, 0.3);
             color: var(--success);
+            box-shadow: var(--glow-success);
+        }
+        
+        .success::before {
+            background: var(--success);
         }
         
         .error {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: var(--danger);
-            color: #FCA5A5;
+            background: rgba(255, 59, 48, 0.08);
+            border-color: rgba(255, 59, 48, 0.3);
+            color: var(--danger);
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.2);
+        }
+        
+        .error::before {
+            background: var(--danger);
         }
         
         table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            background: var(--darker-bg);
-            border-radius: 12px;
+            background: rgba(10, 14, 26, 0.6);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--border-default);
             margin-top: 1.5rem;
+            backdrop-filter: blur(10px);
         }
         
         th, td {
-            padding: 1rem 1.25rem;
+            padding: 1.125rem 1.5rem;
             text-align: left;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--border-subtle);
         }
         
         th {
-            background: var(--slate);
-            font-weight: 700;
+            background: rgba(30, 38, 64, 0.8);
+            font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
+            font-size: 0.6875rem;
+            letter-spacing: 0.12em;
             color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-default);
         }
         
         tbody tr {
-            transition: background 0.15s ease;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        
+        tbody tr::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
         }
         
         tbody tr:hover {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        tbody tr:hover::before {
+            opacity: 1;
         }
         
         tbody tr:last-child td {
@@ -164,21 +316,48 @@
         
         td {
             color: var(--text-primary);
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
         }
         
         @media (max-width: 768px) {
-            .container { padding: 0 1rem; }
-            header { padding: 1rem; }
-            header h1 { font-size: 1.5rem; }
-            nav { gap: 0.375rem; }
-            nav a { padding: 0.5rem 1rem; font-size: 0.8125rem; }
-            .glass-card { padding: 1.5rem; }
+            .container { 
+                padding: 0 1rem; 
+                margin: 1.5rem auto;
+            }
+            
+            .header-container {
+                padding: 0 1rem;
+            }
+            
+            header h1 { 
+                font-size: 1.25rem; 
+                margin-bottom: 0.75rem;
+            }
+            
+            nav { 
+                gap: 0.25rem; 
+            }
+            
+            nav a { 
+                padding: 0.5rem 0.875rem; 
+                font-size: 0.8125rem; 
+            }
+            
+            .glass-card { 
+                padding: 1.75rem; 
+                border-radius: var(--radius-lg);
+            }
             
             table {
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            th, td {
+                padding: 0.875rem 1rem;
             }
         }
         
@@ -187,19 +366,21 @@
 </head>
 <body>
     <header>
-        <h1>Metro System Dashboard</h1>
-        <nav>
-            {% if user.is_authenticated %}
-                <a href="{% url 'tickets:dashboard' %}">Dashboard</a>
-                <a href="{% url 'tickets:ticket_purchase' %}">Buy Ticket</a>
-                <a href="{% url 'tickets:ticket_list' %}">My Tickets</a>
-                <a href="{% url 'stations:list' %}">Stations</a>
-                <a href="{% url 'stations:map' %}">Map</a>
-                <a href="{% url 'account_logout' %}">Logout</a>
-            {% else %}
-                <a href="{% url 'account_login' %}">Login</a>
-            {% endif %}
-        </nav>
+        <div class="header-container">
+            <h1>Metro Transit Network</h1>
+            <nav>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'tickets:dashboard' %}">Dashboard</a>
+                    <a href="{% url 'tickets:ticket_purchase' %}">Buy Ticket</a>
+                    <a href="{% url 'tickets:ticket_list' %}">My Tickets</a>
+                    <a href="{% url 'stations:list' %}">Stations</a>
+                    <a href="{% url 'stations:map' %}">Map</a>
+                    <a href="{% url 'account_logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'account_login' %}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
     </header>
     
     <div class="container">
