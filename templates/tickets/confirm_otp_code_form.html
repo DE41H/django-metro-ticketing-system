@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Offline Purchase{% endblock %}
+{% block title %}Confirm OTP{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -11,60 +11,40 @@
     
     .form-header {
         text-align: center;
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
         border-bottom: 1px solid var(--border-default);
-        position: relative;
-    }
-    
-    .form-header::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 2px;
-        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
     }
     
     .form-header-icon {
-        width: 72px;
-        height: 72px;
+        width: 64px;
+        height: 64px;
         margin: 0 auto 1.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        border-radius: var(--radius-lg);
+        background: var(--primary);
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        box-shadow: var(--glow-primary);
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
+        font-size: 1.75rem;
     }
     
     .form-header h1 {
-        font-family: 'Space Grotesk', sans-serif;
         color: var(--text-primary);
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 700;
         margin-bottom: 0.75rem;
-        letter-spacing: -0.025em;
+        letter-spacing: -0.02em;
     }
     
     .form-header p {
         color: var(--text-secondary);
-        font-size: 1rem;
+        font-size: 0.9375rem;
         font-weight: 400;
         line-height: 1.5;
     }
     
     form p {
-        margin-bottom: 1.75rem;
+        margin-bottom: 1.5rem;
     }
     
     form label {
@@ -84,11 +64,11 @@
         padding: 1rem 1.25rem;
         border: 1px solid var(--border-default);
         border-radius: var(--radius-md);
-        background: rgba(10, 14, 26, 0.5);
+        background: var(--bg-elevated);
         color: var(--text-primary);
         font-size: 1rem;
         font-family: inherit;
-        transition: all var(--transition-base);
+        transition: border-color 0.2s, box-shadow 0.2s;
         font-weight: 500;
     }
     
@@ -97,8 +77,7 @@
     form textarea:focus {
         outline: none;
         border-color: var(--primary);
-        background: rgba(10, 14, 26, 0.7);
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1), var(--glow-primary);
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
     }
     
     .errorlist {
@@ -122,41 +101,23 @@
     }
     
     button[type="submit"] {
-        background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+        background: var(--success);
         color: white;
-        padding: 1.125rem 2.5rem;
+        padding: 1rem 2.5rem;
         border: none;
         border-radius: var(--radius-md);
         font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
         width: 100%;
-        margin-top: 2rem;
-        transition: all var(--transition-base);
-        box-shadow: var(--glow-success);
+        margin-top: 1.5rem;
+        transition: transform 0.15s, box-shadow 0.15s;
         letter-spacing: 0.025em;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    button[type="submit"]::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    button[type="submit"]:hover::before {
-        left: 100%;
     }
     
     button[type="submit"]:hover {
         transform: translateY(-2px);
-        box-shadow: 0 0 30px rgba(0, 208, 132, 0.4), var(--shadow-lg);
+        box-shadow: 0 4px 16px rgba(0, 208, 132, 0.4);
     }
     
     button[type="submit"]:active {
@@ -175,12 +136,12 @@
         font-weight: 500;
         font-size: 0.9375rem;
         border-radius: var(--radius-md);
-        transition: all var(--transition-base);
+        transition: all 0.2s;
     }
     
     .back-link:hover {
         color: var(--text-primary);
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--bg-elevated);
     }
 </style>
 {% endblock %}
@@ -188,20 +149,20 @@
 {% block content %}
 <div class="glass-card form-container">
     <div class="form-header">
-        <div class="form-header-icon">🎫</div>
-        <h1>Offline Ticket Purchase</h1>
-        <p>Issue a ticket for walk-in customers without wallet registration</p>
+        <div class="form-header-icon">🔐</div>
+        <h1>Confirm OTP Code</h1>
+        <p>Enter the verification code to complete your action</p>
     </div>
     
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Issue Ticket (No Charge)</button>
+        <button type="submit">Verify Code</button>
     </form>
     
-    <a href="{% url 'tickets:scanner' %}" class="back-link">
+    <a href="{% url 'tickets:dashboard' %}" class="back-link">
         <span>←</span>
-        <span>Back to Scanner Portal</span>
+        <span>Back to Dashboard</span>
     </a>
 </div>
 {% endblock %}
