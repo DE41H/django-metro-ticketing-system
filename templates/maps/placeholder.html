@@ -1,9 +1,50 @@
 {% extends "base.html" %}
 
+{% block title %}Metro Map{% endblock %}
+
+{% block extra_css %}
+<style>
+    .map-container {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+    
+    .map-icon {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+    }
+    
+    h2 {
+        color: var(--text-primary);
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .coming-soon {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-  <h2>Metro Map</h2>
-  <div>
-    <!-- Map or instructions will go here. -->
-    <p>Map content coming soon.</p>
-  </div>
+<div class="glass-card">
+    <div class="map-container">
+        <div class="map-icon">🗺️</div>
+        <h2>Metro Map</h2>
+        <p class="coming-soon">Map content coming soon.</p>
+    </div>
+</div>
 {% endblock %}

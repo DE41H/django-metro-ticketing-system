@@ -2,18 +2,155 @@
 
 {% block title %}Buy Ticket{% endblock %}
 
+{% block extra_css %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .page-header h1 {
+        color: var(--text-primary);
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+    }
+    
+    .wallet-card {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .wallet-card p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    
+    .wallet-balance {
+        color: white;
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+    
+    .purchase-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    form p {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.625rem;
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+    
+    select,
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 0.875rem 1.125rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        background: var(--darker-bg);
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+        font-family: inherit;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+    
+    select:focus,
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    button[type="submit"] {
+        background: linear-gradient(135deg, var(--success), #059669);
+        color: white;
+        padding: 1rem 2.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1.5rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        letter-spacing: 0.025em;
+    }
+    
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .topup-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.5rem;
+        padding: 0.875rem;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 10px;
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.2s ease;
+    }
+    
+    .topup-link:hover {
+        background: rgba(245, 158, 11, 0.15);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h1>Purchase New Ticket</h1>
+<div class="glass-card">
+    <div class="page-header">
+        <h1>Purchase New Ticket</h1>
+    </div>
     
     {% if user.is_authenticated and user.wallet %}
-        <p>Your Current Wallet Balance: <strong>${{ user.wallet.balance|default:"0.00" }}</strong></p>
+        <div class="wallet-card">
+            <p>Current Wallet Balance</p>
+            <div class="wallet-balance">${{ user.wallet.balance|default:"0.00" }}</div>
+        </div>
     {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Purchase Ticket</button>
-    </form>
     
-    <p><a href="{% url 'tickets:wallet_balance_update' %}">Top Up Wallet</a></p> 
+    <div class="purchase-form">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Purchase Ticket</button>
+        </form>
+        
+        <a href="{% url 'tickets:wallet_balance_update' %}" class="topup-link">💰 Top Up Wallet</a>
+    </div>
+</div>
 {% endblock %}

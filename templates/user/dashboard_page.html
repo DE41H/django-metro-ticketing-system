@@ -2,40 +2,212 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block content %}
-    <h1>Welcome, {{ user.username }}!</h1>
+{% block extra_css %}
+<style>
+    .welcome-section {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .welcome-section h1 {
+        color: var(--text-primary);
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+    }
+    
+    .wallet-summary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .wallet-summary h2 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    
+    .wallet-balance {
+        color: white;
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .wallet-summary a {
+        display: inline-block;
+        padding: 0.75rem 1.75rem;
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        letter-spacing: 0.025em;
+    }
+    
+    .wallet-summary a:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+    
+    .no-wallet {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        padding: 1.5rem;
+        font-weight: 500;
+    }
+    
+    .section-card {
+        margin-bottom: 2rem;
+    }
+    
+    .section-card h2 {
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--glass-border);
+        letter-spacing: -0.025em;
+    }
+    
+    .action-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .action-list li a {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: var(--darker-bg);
+        padding: 1.125rem 1.375rem;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        border: 1px solid var(--glass-border);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .action-list li a:hover {
+        background: var(--slate-light);
+        border-color: var(--primary);
+        transform: translateX(4px);
+    }
+    
+    .action-icon {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .staff-section .action-icon {
+        background: linear-gradient(135deg, var(--accent), #F97316);
+    }
+    
+    hr {
+        border: none;
+        height: 1px;
+        background: var(--glass-border);
+        margin: 2.5rem 0;
+    }
+</style>
+{% endblock %}
 
+{% block content %}
+<div class="glass-card">
+    <div class="welcome-section">
+        <h1>Welcome, {{ user.username }}!</h1>
+    </div>
+    
     {% if user.wallet %}
-        <h2>Wallet Summary</h2>
-        <p>Current Balance: <strong>${{ user.wallet.balance|default:"0.00" }}</strong></p>
-        <p><a href="{% url 'tickets:wallet_balance_update' %}">Add Funds</a></p>
+        <div class="wallet-summary">
+            <h2>Wallet Summary</h2>
+            <div class="wallet-balance">${{ user.wallet.balance|default:"0.00" }}</div>
+            <a href="{% url 'tickets:wallet_balance_update' %}">💳 Add Funds</a>
+        </div>
     {% else %}
-        <p>Wallet not initialized. Contact support.</p>
+        <div class="wallet-summary">
+            <p class="no-wallet">Wallet not initialized. Contact support.</p>
+        </div>
     {% endif %}
     
+    <div class="section-card">
+        <h2>Ticket Actions</h2>
+        <ul class="action-list">
+            <li>
+                <a href="{% url 'tickets:ticket_purchase' %}">
+                    <span class="action-icon">🎫</span>
+                    <span>Buy New Ticket</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'tickets:ticket_list' %}">
+                    <span class="action-icon">📋</span>
+                    <span>View My Tickets</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
     <hr>
     
-    <h2>Ticket Actions</h2>
-    <ul>
-        <li><a href="{% url 'tickets:ticket_purchase' %}">Buy New Ticket</a></li>
-        <li><a href="{% url 'tickets:ticket_list' %}">View My Tickets</a></li>
-    </ul>
-
-    <hr>
+    <div class="section-card">
+        <h2>Network Information</h2>
+        <ul class="action-list">
+            <li>
+                <a href="{% url 'stations:list' %}">
+                    <span class="action-icon">🚉</span>
+                    <span>Stations List</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'stations:map' %}">
+                    <span class="action-icon">🗺️</span>
+                    <span>Metro Map</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     
-    <h2>Network Information</h2>
-    <ul>
-        <li><a href="{% url 'stations:list' %}">Stations List</a></li>
-        <li><a href="{% url 'stations:map' %}">Metro Map</a></li>
-    </ul>
-
     {% if user.is_staff %}
     <hr>
     
-    <h2>Staff Tools</h2>
-    <ul>
-        <li><a href="{% url 'tickets:scanner' %}">Ticket Scanner Interface</a></li>
-    </ul>
+    <div class="section-card staff-section">
+        <h2>Staff Tools</h2>
+        <ul class="action-list">
+            <li>
+                <a href="{% url 'tickets:scanner' %}">
+                    <span class="action-icon">📱</span>
+                    <span>Ticket Scanner Interface</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     {% endif %}
-
+</div>
 {% endblock %}
