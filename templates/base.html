@@ -229,7 +229,7 @@
                     <a href="{% url 'tickets:ticket_purchase' %}">Buy Ticket</a>
                     <a href="{% url 'tickets:ticket_list' %}">My Tickets</a>
                     <a href="{% url 'stations:list' %}">Stations</a>
-                    <a href="{% url 'stations:map' %}">Map</a>
+                    <a href="{% url 'stations:map' %}" target="_blank" rel="noopener noreferrer">Map</a>
                     <a href="{% url 'account_logout' %}">Logout</a>
                 {% else %}
                     <a href="{% url 'account_login' %}">Login</a>
