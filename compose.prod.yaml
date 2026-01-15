@@ -5,8 +5,8 @@ services:
       context: ./nginx
       dockerfile: ./Dockerfile
     command: nginx -g 'daemon off;'
-    expose:
-      - "8001"
+    ports:
+      - 8001:80
     depends_on:
       - web
     volumes:
